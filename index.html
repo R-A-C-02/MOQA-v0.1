@@ -918,7 +918,8 @@ function renderStack(m){
   s += `<text class="lb halo" x="${r1(dlx)}" y="${mt - 14}" text-anchor="middle">${exLab}</text>`;
   if (Math.abs(xd - xdom) > 4){
     const lx = clamp(xdom, ml + 60, W - mr - 60);
-    s += `<text class="lb-m halo" x="${r1(lx + (xdom < xd ? -6 : 6))}" y="${mt + 14}" text-anchor="${xdom < xd ? 'end' : 'start'}">${Math.abs(p.cn) > 0.05 ? 'Domanda + Centro-Nord' : 'Domanda NORD'} ${f(demTot(p), 1)}</text>`;
+    const toRight = xdom >= xd && xdom < W - mr - 170;    // vicino al bordo destro l'etichetta va a sinistra della linea
+    s += `<text class="lb-m halo" x="${r1(lx + (toRight ? 6 : -6))}" y="${mt + 14}" text-anchor="${toRight ? 'start' : 'end'}">${Math.abs(p.cn) > 0.05 ? 'Domanda + Centro-Nord' : 'Domanda NORD'} ${f(demTot(p), 1)}</text>`;
   }
 
   if (cl.scarcity){
