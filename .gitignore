@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Credentials and local settings: never in this repository
+.env
+*token*
+*credentials*
+r2.json
+.claude/
+.vscode/
+.idea/

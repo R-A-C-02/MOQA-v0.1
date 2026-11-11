@@ -1,0 +1,1800 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Merit order del Nord Italia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --paper:#edf0f3; --panel:#ffffff; --panel-2:#f4f6f8; --ink:#0f2233; --muted:#56657a; --faint:#7f8d9e;
+  --line:#d5dce3; --grid:#e7ebef;
+  --signal:#c8235b; --signal-soft:rgba(200,35,91,.09);
+  --band:rgba(15,34,51,.05); --band-2:rgba(15,34,51,.10);
+  --pos:#17784a; --neg:#b3263e;
+  --t-mr:#9aa5b1; --t-ror:#5c93c4; --t-nucI:#46358c; --t-nucF:#8e7fd1; --t-wind:#6fbcab; --t-solar:#e6b43f;
+  --t-hydro:#13707a; --t-coal:#4a3f3a; --t-ccgtA:#1d3f6e; --t-ccgtB:#3b6ba5; --t-ocgt:#e3743a; --t-oil:#7a5230; --t-dr:#9c2f3c;
+  --t-exch:#8a9a3a; --t-out:#c9d1da; --t-heat:#e3743a;
+  --l-delta:#3b6ba5; --l-quad:#7f8d9e;
+  --f-body:"Barlow", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --f-head:"Barlow Semi Condensed", "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#0c1520; --panel:#121e2c; --panel-2:#172536; --ink:#e4ebf2; --muted:#9fb0c2; --faint:#74859a;
+    --line:#233449; --grid:#1a2a3c;
+    --signal:#ff5c8f; --signal-soft:rgba(255,92,143,.12);
+    --band:rgba(228,235,242,.05); --band-2:rgba(228,235,242,.10);
+    --pos:#4fd08c; --neg:#ff7a8e;
+    --t-mr:#7c8896; --t-ror:#6aa6d6; --t-nucI:#7d6ad6; --t-nucF:#b5a8ee; --t-wind:#62b8a6; --t-solar:#f0c04e;
+    --t-hydro:#2aa0a8; --t-coal:#8c7a70; --t-ccgtA:#3c6fb0; --t-ccgtB:#6197d8; --t-ocgt:#f08a4b; --t-oil:#b07c4f; --t-dr:#d4515f;
+    --t-exch:#a9bb52; --t-out:#2c3d52; --t-heat:#f08a4b;
+    --l-delta:#6197d8; --l-quad:#8c9cb0;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0c1520; --panel:#121e2c; --panel-2:#172536; --ink:#e4ebf2; --muted:#9fb0c2; --faint:#74859a;
+  --line:#233449; --grid:#1a2a3c;
+  --signal:#ff5c8f; --signal-soft:rgba(255,92,143,.12);
+  --band:rgba(228,235,242,.05); --band-2:rgba(228,235,242,.10);
+  --pos:#4fd08c; --neg:#ff7a8e;
+  --t-mr:#7c8896; --t-ror:#6aa6d6; --t-nucI:#7d6ad6; --t-nucF:#b5a8ee; --t-wind:#62b8a6; --t-solar:#f0c04e;
+  --t-hydro:#2aa0a8; --t-coal:#8c7a70; --t-ccgtA:#3c6fb0; --t-ccgtB:#6197d8; --t-ocgt:#f08a4b; --t-oil:#b07c4f; --t-dr:#d4515f;
+  --t-exch:#a9bb52; --t-out:#2c3d52; --t-heat:#f08a4b;
+  --l-delta:#6197d8; --l-quad:#8c9cb0;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 62px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--f-head);color:var(--ink)}
+button{font-family:inherit}
+a{color:var(--l-delta)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+.top{max-width:1440px;margin:0 auto;padding:28px 24px 14px;position:relative}
+.top-tools{position:absolute;top:18px;right:24px;display:flex;gap:8px}
+.top-tools button{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);font-size:13.5px;font-weight:600;cursor:pointer}
+.top-tools button:hover{border-color:var(--ink)}
+.top-tools svg{width:16px;height:16px}
+.top-tools .lg span{color:var(--faint);font-weight:500}
+.top-tools .lg span.on{color:var(--ink);font-weight:700}
+@media (max-width:640px){.top{padding-top:62px}.top-tools{top:14px;right:16px}}
+.top h1{font-weight:700;font-size:clamp(28px,3.6vw,42px);line-height:1.06;letter-spacing:-.005em;margin:0 0 8px;max-width:22ch}
+.top p{margin:0;color:var(--muted);max-width:74ch}
+.jumpbar{position:sticky;top:0;z-index:20;background:var(--paper);padding-top:env(safe-area-inset-top,0px);border-bottom:1px solid var(--line)}
+.jump{max-width:1440px;margin:0 auto;padding:10px 24px;display:flex;gap:6px 18px;font-size:14.5px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump a{color:var(--ink);font-weight:500;text-decoration:none;border-bottom:1px solid var(--line)}
+.jump a:hover{border-bottom-color:var(--ink)}
+.jump a[aria-current="true"]{color:var(--signal);border-bottom:2px solid var(--signal)}
+
+.layout{max-width:1440px;margin:0 auto;padding:18px 24px 56px;display:grid;grid-template-columns:318px minmax(0,1fr);gap:24px;align-items:start}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);max-height:calc(100vh - 76px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px 16px}
+@media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr)}.side{position:static;max-height:none}}
+
+.grp{padding:12px 0 6px;border-top:1px solid var(--line)}
+.grp:first-child{border-top:0;padding-top:2px}
+.grp h3{font-size:16px;font-weight:600;margin:0 0 6px}
+details.grp summary{font-family:var(--f-head);font-size:16px;font-weight:600;cursor:pointer;padding:2px 0 6px;list-style-position:inside}
+.grp-nuc{background:linear-gradient(90deg,var(--t-nucI) 0 3px,transparent 3px);padding-left:12px;margin-left:-16px;padding-right:0}
+.grp-nuc h3{color:var(--t-nucI)}
+.ctl{margin:8px 0 14px}
+.ctl-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ctl label,.ctl .lab{font-weight:500;font-size:14.5px}
+.ctl output{font-weight:600;font-size:14.5px;white-space:nowrap}
+.ctl-hint{font-size:12.5px;color:var(--faint);line-height:1.35;margin-top:1px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;margin:4px 0 0;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--ink) 0 var(--pct,50%),var(--line) var(--pct,50%) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:var(--panel);border:2px solid var(--ink)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--ink)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--ink)}
+.grp-main input[type=range]::-webkit-slider-thumb{background:var(--ink)}
+.grp-main input[type=range]::-moz-range-thumb{background:var(--ink)}
+input[type=range]:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
+
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{font-size:13.5px;font-weight:500;padding:5px 11px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);border-radius:999px;cursor:pointer;text-align:left}
+.presets button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.seg{display:flex;margin-top:6px;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{flex:1;font-size:13.5px;font-weight:500;padding:6px 6px;border:0;background:var(--panel-2);color:var(--muted);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.readout dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:4px 0 0;font-size:14px}
+.readout dt{color:var(--muted)}
+.readout dd{margin:0;text-align:right;font-weight:600}
+
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 22px 22px;margin:0 0 20px}
+.sec h2{font-size:23px;font-weight:700;line-height:1.2;margin:0 0 4px;display:flex;gap:10px;align-items:baseline}
+.sec h2 .n{color:var(--faint);font-weight:600;min-width:1ch}
+.lede{color:var(--muted);max-width:78ch;margin:0 0 14px}
+.sec h3{font-size:18px;font-weight:600;margin:0 0 4px}
+.sec p{max-width:80ch}
+.sec-nuc{border-color:var(--t-nucI);border-width:1px 1px 1px 4px}
+.sub{border-top:1px solid var(--line);padding-top:18px;margin-top:22px}
+.sub>p{margin:6px 0 10px}
+.sub ol,.sub ul{max-width:80ch;padding-left:22px;margin:6px 0 10px}
+.sub li{margin:5px 0}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:6px 0 10px}
+.kpis.k5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.kpi{padding:9px 14px;border-left:1px solid var(--line);min-width:0}
+.kpi:first-child{border-left:0;padding-left:0}
+.kpi span{display:block;font-size:13px;color:var(--muted)}
+.kpi b{display:block;font-family:var(--f-head);font-size:23px;font-weight:700;line-height:1.15;overflow-wrap:anywhere}
+.kpi b small{font-size:14px;font-weight:600;color:var(--muted)}
+@media (max-width:760px){.kpis,.kpis.k5{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi:nth-child(odd){border-left:0;padding-left:0}.kpi:nth-child(n+3){border-top:1px solid var(--line)}}
+
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible;touch-action:pan-y}
+.gl{stroke:var(--grid);stroke-width:1}
+.tk{fill:var(--faint);font:500 12px var(--f-body);font-variant-numeric:tabular-nums}
+.axl{fill:var(--muted);font:500 12.5px var(--f-body)}
+.lb{fill:var(--ink);font:600 13px var(--f-body)}
+.lb-s{fill:var(--signal);font:600 13px var(--f-body)}
+.lb-m{fill:var(--muted);font:500 12px var(--f-body)}
+.lb-w{fill:#fff;font:600 12.5px var(--f-body)}
+.halo{paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.axis0{stroke:var(--muted);stroke-width:1;opacity:.7}
+.band1{fill:var(--band-2)}
+.band2{fill:var(--band)}
+.tip{position:absolute;left:0;top:0;pointer-events:none;background:var(--ink);color:var(--panel);padding:7px 10px;border-radius:6px;font-size:13px;line-height:1.4;white-space:nowrap;transform:translate(-50%,calc(-100% - 12px));opacity:0;transition:opacity .08s;z-index:2}
+.tip.on{opacity:1}
+.tip b{font-weight:600}
+
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;margin:10px 0 0;font-size:13.5px;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend i.ln{height:0;width:18px;border-top:2.5px solid;border-radius:0;vertical-align:3px}
+.legend i.ln.dash{border-top-style:dashed}
+.legend i.ln.dot{border-top-style:dotted}
+
+.formula{margin:12px 0 0;padding:10px 14px;background:var(--panel-2);border-radius:8px;font-size:14.5px;overflow-x:auto}
+.formula .l{color:var(--muted)}
+.readline{display:flex;flex-wrap:wrap;gap:6px 26px;margin:12px 0 0;font-size:14.5px}
+.readline span{color:var(--muted)}
+.readline b{font-weight:600;color:var(--ink)}
+
+.tw{overflow-x:auto;margin:0 -2px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:bottom}
+td{padding:8px 10px;border-bottom:1px solid var(--grid);vertical-align:top}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.wrap{min-width:240px;color:var(--muted)}
+#tech{font-size:13.5px}
+#tech th,#tech td{padding:7px 6px}
+#tech td{white-space:nowrap}
+#tech td:first-child{white-space:normal;min-width:170px}
+tr.hl td{background:var(--signal-soft)}
+tr.dim td{color:var(--faint)}
+tr.tot td{font-weight:600;border-top:1px solid var(--line)}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:8px;vertical-align:-1px}
+.st{display:inline-block;font-size:12.5px;font-weight:600;padding:1px 9px;border-radius:999px;background:var(--panel-2);color:var(--muted);white-space:nowrap}
+.st.m{background:var(--signal);color:#fff}
+.st.in{background:var(--band-2);color:var(--ink)}
+.v-pos{color:var(--pos);font-weight:700}
+.v-neg{color:var(--neg);font-weight:700}
+.v-zero{color:var(--muted);font-weight:700}
+.gsym{font-family:var(--f-head);font-weight:700;font-size:18px}
+td.big{font-family:var(--f-head);font-size:19px;white-space:nowrap}
+
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+@media (max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
+
+.note{border-left:3px solid var(--signal);padding:9px 14px;background:var(--signal-soft);border-radius:0 7px 7px 0;font-size:14.5px;max-width:84ch;margin:16px 0 0}
+.note b{font-weight:600}
+.note.nuc{border-left-color:var(--t-nucI);background:var(--band)}
+
+.verdict{margin:10px 0 0;padding:12px 16px;border:1px solid var(--line);border-radius:8px;max-width:84ch}
+.verdict b.big{font-family:var(--f-head);font-size:20px;display:block;margin-bottom:2px}
+
+.scen{max-width:380px;margin-top:14px}
+
+.step{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0;padding-top:4px}
+.step .k{font-family:var(--f-head);font-weight:700;font-size:20px;color:var(--faint);line-height:1.2}
+.step h4{margin:0 0 4px;font-size:17px;font-weight:600}
+.step p.si{margin:0 0 6px;color:var(--muted);max-width:80ch}
+.eq{display:grid;grid-template-columns:minmax(78px,auto) minmax(0,1fr);gap:0 14px;padding:8px 0;border-top:1px dashed var(--grid);font-size:14.5px}
+.eq:first-of-type{border-top:0}
+.eq .lhs{font-style:italic;font-weight:600;padding-top:1px}
+.eq .fx{color:var(--muted)}
+.eq .res{font-weight:700}
+.eq .rhs{overflow-x:auto}
+.eq .rhs>div{white-space:nowrap}
+.sub-t{font-size:14px}
+.sub-t td,.sub-t th{padding:6px 9px}
+
+ul.hyp{margin:0;padding-left:20px;max-width:84ch}
+ul.hyp li{margin:4px 0}
+dl.gls{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr);gap:8px 20px;margin:0;max-width:980px}
+dl.gls dt{font-weight:600}
+dl.gls dd{margin:0;color:var(--muted)}
+@media (max-width:640px){dl.gls{grid-template-columns:minmax(0,1fr);gap:2px}dl.gls dd{margin-bottom:10px}}
+@media (prefers-reduced-motion: reduce){.tip{transition:none}}
+</style>
+<style>
+.grp-real{background:linear-gradient(90deg,var(--signal) 0 3px,transparent 3px);padding-left:12px;margin-left:-16px}
+.grp-real h3{color:var(--signal)}
+.real-row{display:flex;gap:6px;margin:6px 0}
+.real-row select{flex:1;min-width:0;font:inherit;font-size:14px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);color:var(--ink)}
+.real-btn{font:inherit;font-size:13.5px;font-weight:600;padding:6px 11px;border:1px solid var(--signal);background:var(--signal);color:#fff;border-radius:999px;cursor:pointer}
+.real-btn.ghost{background:transparent;color:var(--signal)}
+.real-dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:6px 0 0;font-size:13.5px}
+.real-dl dt{color:var(--muted)} .real-dl dd{margin:0;text-align:right;font-weight:600}
+.real-miss{font-size:13px;color:var(--muted);line-height:1.4}
+.real-miss code{font-size:12px;background:var(--panel-2);padding:1px 4px;border-radius:4px}
+#rchart,#rchart2{cursor:crosshair}
+.chart-sub{margin-top:14px}
+.rleg{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:4px 0 0}
+.rleg i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.rmbar{display:flex;align-items:flex-end;justify-content:space-between;gap:10px 18px;flex-wrap:wrap}
+.rmbar .seg{margin-top:0;min-width:250px}
+.rmctl{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.rmshow{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.rmshow select{font:inherit;font-size:14px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:6px 8px;min-width:120px}
+#rmtab{font-size:13.5px}
+#rmtab th,#rmtab td{padding:7px 6px}
+#rmtab td{white-space:nowrap}
+#rmtab td.wrap{white-space:normal;min-width:170px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+.rm-more{font-size:13.5px;color:var(--muted);margin:8px 0 0}
+</style>
+<script src="data/moqa_dati.js"></script>
+<script src="i18n/en.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-tools" translate="no">
+    <button type="button" class="lg" id="btn-lang" aria-label="Lingua: italiano. Passa all'inglese" title="Italiano / English"><span data-l="it">IT</span><span aria-hidden="true">·</span><span data-l="en">EN</span></button>
+    <button type="button" id="btn-theme" aria-label="Tema scuro" title="Chiaro / scuro"></button>
+  </div>
+  <h1>Merit order del Nord Italia</h1>
+  <p>Muovi le variabili nel pannello: stack, prezzo, import e greche si ricalcolano mentre trascini. La pagina parte dallo scenario Base; le ore reali di GME ed ENTSO-E si caricano dal pannello a sinistra o con un clic sui grafici.</p>
+</header>
+<div class="jumpbar">
+<nav class="jump" aria-label="Sezioni">
+    <a href="#s1">Stack</a><a href="#s2">Parco e costi</a><a href="#s3">Frontiere</a><a href="#s4">Prezzo e rischio</a><a href="#s5">Greche</a><a href="#s6">P&amp;L</a><a href="#s7">Calcoli</a><a href="#s8">REMIT</a><a href="#s0">Mese reale</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="side" aria-label="Variabili del modello">
+    <div class="grp grp-real" id="real-grp">
+      <h3>Dati reali GME ed ENTSO-E</h3>
+      <div id="real-box"></div>
+    </div>
+    <div class="grp">
+      <h3>Scenari pronti</h3>
+      <div class="presets" id="presets"></div>
+    </div>
+    <div class="grp grp-main">
+      <h3>Variabili principali</h3>
+      <div id="g-main"></div>
+    </div>
+    <div class="grp grp-nuc">
+      <h3>Gas e frontiere</h3>
+      <div id="g-nuc"></div>
+    </div>
+    <div class="grp">
+      <h3>Posizione e incertezza</h3>
+      <div class="ctl">
+        <div class="ctl-top"><span class="lab">Fattore di rischio</span></div>
+        <div class="seg" role="group" aria-label="Fattore di rischio" id="facseg">
+          <button type="button" data-fac="imp" aria-pressed="true">Import</button>
+          <button type="button" data-fac="gas" aria-pressed="false">Gas</button>
+          <button type="button" data-fac="sol" aria-pressed="false">Solare</button>
+          <button type="button" data-fac="temp" aria-pressed="false">Temp.</button>
+        </div>
+        <div class="ctl-hint">La variabile incerta su cui si calcolano delta, gamma, vega e theta.</div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-top"><span class="lab">Prodotto</span></div>
+        <div class="seg" role="group" aria-label="Durata del prodotto">
+          <button type="button" data-dur="1" aria-pressed="true">Ora</button>
+          <button type="button" data-dur="0.25" aria-pressed="false">Quarto d'ora</button>
+        </div>
+      </div>
+      <div id="g-risk"></div>
+    </div>
+    <details class="grp" id="adv">
+      <summary>Altre variabili</summary>
+      <div id="g-adv"></div>
+    </details>
+    <div class="grp readout">
+      <h3>Lettura rapida</h3>
+      <dl id="readout"></dl>
+    </div>
+  </aside>
+
+  <main>
+    <section class="sec" id="s1">
+      <h2><span class="n">1</span>La stack del NORD</h2>
+      <p class="lede">A sinistra c'è il blocco a costo quasi zero: altre must-run, idro fluente, eolico e solare. Poi viene la parte che fa il prezzo: l'idro a bacino al suo water value e il parco a gas, dal CCGT più efficiente al turbogas, con olio e demand response in fondo. La linea tratteggiata è la domanda del NORD; quella continua toglie l'import dai vicini, che nel NORD vale diversi GW. Passa il cursore sui blocchi per leggere costi e offerte.</p>
+      <div class="kpis" id="kpis"></div>
+      <div class="chart" id="stackwrap"><div id="stack"></div><div class="tip" id="tip" role="status"></div></div>
+      <div class="legend" id="legend"></div>
+      <div class="formula" id="stack-eq"></div>
+      <p class="note"><b>Cosa guardare.</b> Nel NORD la domanda residua cade quasi sempre sui CCGT, quindi il prezzo segue PSV ed EUA. Cambia nelle ore centrali con molto solare, quando il margine passa all'idro o all'import, e quando la frontiera non è satura e il prezzo si aggancia a quello dei vicini.</p>
+    </section>
+
+    <section class="sec" id="s2">
+      <h2><span class="n">2</span>Il parco e i costi</h2>
+      <p class="lede">Tutte le tecnologie con capacità, produzione nell'ora e costo marginale ricalcolato con i tuoi prezzi di gas, carbone e CO2. Le righe senza rendimento non hanno un SRMC da combustibile: offrono a un costo opportunità (l'acqua) o al prezzo dei vicini.</p>
+      <div class="tw"><table id="tech"></table></div>
+      <p class="note"><b>Cosa guardare:</b> la colonna di stato. Se l'etichetta "Marginale" cade su un CCGT, il prezzo del NORD segue PSV ed EUA; se cade sull'idro a bacino lo fa il water value; se cade sugli scambi lo fa il prezzo dei vicini.</p>
+    </section>
+
+    <section class="sec sec-nuc" id="s3">
+      <h2><span class="n">3</span>Import e frontiere del NORD</h2>
+      <p class="lede">Il NORD confina con Svizzera, Francia, Austria e Slovenia e scambia energia con la zona Centro-Nord. Quando i vicini costano meno, l'import riempie la capacità di scambio e sposta a destra tutta la stack: meno gas acceso, prezzo più basso. Quando la capacità è piena, il NORD si stacca dai vicini e il prezzo torna a farlo il gas.</p>
+      <div class="kpis k5" id="ikpi"></div>
+
+      <div class="sub">
+        <h3>Le frontiere nell'ora caricata</h3>
+        <p>Flusso fisico netto e capacità day-ahead prevista su ogni frontiera, dai dati ENTSO-E dell'ora caricata nel pannello. Positivo significa import nel NORD.</p>
+        <div class="tw"><table id="itab"></table></div>
+      </div>
+
+      <div class="sub">
+        <h3>Quanto vale un GW di capacità di import</h3>
+        <p>Tieni fermo tutto il resto e muovi solo la capacità di import dall'estero. La pendenza della curva è quanto sale il prezzo del NORD per ogni GW di capacità che manca: una linea fuori servizio, una riduzione sulla frontiera svizzera o francese.</p>
+        <div class="chart" id="iprice"></div>
+        <div class="legend">
+          <span><i class="ln" style="border-color:var(--t-exch)"></i>Prezzo del NORD in funzione della capacità di import</span>
+          <span><i class="ln dash" style="border-color:var(--l-delta)"></i>Tangente nel punto attuale</span>
+        </div>
+        <div class="readline" id="iprice-read"></div>
+      </div>
+      <div id="iverdict"></div>
+      <p class="note"><b>Come si usa in giornata.</b> Tieni due numeri: lo spread tra il NORD e i vicini sull'ora che tradi, e quanta capacità di import resta libera. Con capacità libera, uno shock sul NORD (un CCGT che scatta, meno solare del previsto) viene assorbito in parte dall'import e il prezzo si muove poco. Con la frontiera piena, lo stesso shock passa tutto sull'offerta interna del NORD.</p>
+    </section>
+
+    <section class="sec" id="s4">
+      <h2><span class="n">4</span>Il prezzo in funzione del fattore di rischio</h2>
+      <p class="lede" id="ps-lede"></p>
+      <div class="chart" id="ps"></div>
+      <div class="legend">
+        <span><i class="ln" style="border-color:var(--ink)"></i>Prezzo P(x)</span>
+        <span><i class="ln dash" style="border-color:var(--l-delta)"></i>Tangente: la pendenza è il delta</span>
+        <span><i style="background:var(--band-2)"></i>±1σ e ±2σ dell'incertezza</span>
+        <span><i class="ln" style="border-color:var(--signal)"></i>Prezzo atteso E[P]</span>
+      </div>
+      <div class="readline" id="ps-read"></div>
+    </section>
+
+    <section class="sec" id="s5">
+      <h2><span class="n">5</span>Le greche della tua posizione</h2>
+      <p class="lede">Calcolate sulla posizione impostata nel pannello, su un prodotto del NORD. Il segno segue il tuo P&amp;L: positivo significa che guadagni se quella variabile sale di un'unità.</p>
+      <div class="tw"><table id="greeks"></table></div>
+    </section>
+
+    <section class="sec" id="s6">
+      <h2><span class="n">6</span>Il P&amp;L: realtà contro approssimazioni</h2>
+      <p class="lede">Il P&amp;L vero della posizione, confrontato con quello che promette il solo delta (una retta) e con delta più gamma (una parabola). Sposta l'errore e guarda di quanto sbaglia ciascuna stima.</p>
+      <div class="chart" id="pnl"></div>
+      <div class="legend">
+        <span><i class="ln" style="border-color:var(--signal)"></i>P&amp;L reale</span>
+        <span><i class="ln dash" style="border-color:var(--l-delta)"></i>Solo delta</span>
+        <span><i class="ln dot" style="border-color:var(--l-quad)"></i>Delta + gamma</span>
+      </div>
+      <div class="scen ctl">
+        <div class="ctl-top"><label for="in-err" id="err-lab">Errore</label><output id="out-err" for="in-err"></output></div>
+        <input type="range" id="in-err" min="-8" max="8" step="0.1" value="-2">
+        <div class="ctl-hint" id="err-hint"></div>
+      </div>
+      <div class="tw"><table id="scen"></table></div>
+    </section>
+
+    <section class="sec" id="s7">
+      <h2><span class="n">7</span>Tutti i calcoli, passo per passo</h2>
+      <p class="lede">Ogni numero che vedi sopra, ricostruito dall'inizio con i valori correnti.</p>
+      <div id="calc"></div>
+      <div class="sub">
+        <h3>Ipotesi del modello</h3>
+        <ul class="hyp">
+          <li>Gas, idro a bacino con pompaggi e carbone disponibili: capacità installata a inizio anno delle unità di produzione ENTSO-E (A71, zona NORD, unità da 100 MW in su) meno le indisponibilità dichiarate nei messaggi REMIT (A80), ora per ora (sezione 8). La tecnologia di ogni fermata è quella dell'unità in A71, riconosciuta dal codice EIC, perché in A80 molti cicli combinati del NORD sono dichiarati come geotermico o senza fonte. La capacità è quella nominale: le riduzioni per temperatura che non passano dal REMIT non sono tolte. Senza dati, i valori del pannello sono indicativi.</li>
+          <li>Il gas disponibile è diviso in tre fasce di rendimento indicative: CCGT recenti 45% (η da 58% a 53%), CCGT meno efficienti 40% (da 53% a 46%), turbogas e vecchi impianti a vapore 15% (da 40% a 32%). Tutti comprano il gas al PSV.</li>
+          <li>Il NORD è una zona unica. Gli scambi con Svizzera, Francia, Austria e Slovenia sono riassunti in un solo vicino al prezzo medio di Francia e Svizzera: il NORD importa a pieno da 20 €/MWh sopra quel prezzo, esporta a pieno da 20 €/MWh sotto, e in mezzo lo scambio varia in modo lineare. Le capacità sono la somma delle capacità day-ahead previste (A61). Lo scambio con il Centro-Nord è preso dai flussi reali e si somma alla domanda.</li>
+          <li>L'idro a bacino e i pompaggi offrono tra il water value meno 25 e più 25 €/MWh. L'olio offre tra 260 e 320 €/MWh, la demand response a 450 €/MWh.</li>
+          <li>Le offerte sono costo più un margine di scarsità M × (quota della capacità dispatchable già usata)³. Niente costi di avviamento, rampe o minimi tecnici.</li>
+          <li>Prezzo con pavimento a 0 €/MWh e tetto del modello a 4.000 €/MWh.</li>
+          <li>L'incertezza del fattore di rischio è normale, con deviazione standard ridotta di √(ore alla consegna ÷ 24). Delta e gamma usano differenze finite.</li>
+        </ul>
+      </div>
+      <div class="sub">
+        <h3>Glossario</h3>
+        <dl class="gls" id="gls"></dl>
+      </div>
+    </section>
+
+    <section class="sec" id="s8">
+      <h2><span class="n">8</span>Indisponibilità degli impianti (REMIT)</h2>
+      <p class="lede">I messaggi REMIT pubblicati su ENTSO-E (A80) dicono quali impianti del NORD sono fermi o ridotti, di quanti MW e fino a quando. Per ogni messaggio vale l'ultima versione; quelli annullati o ritirati non contano. Le fermate di gas, idro a bacino e carbone vengono tolte ora per ora dalla capacità installata: è da lì che arriva il gas disponibile che carica la stack. Clicca sul grafico per caricare un'ora in tutta la pagina.</p>
+      <div id="rmmiss"></div>
+      <div id="rmbody">
+        <div class="kpis k5" id="rmkpi"></div>
+        <div class="chart" id="rmwrap"><div id="rmchart"></div><div class="tip" id="rmtip" role="status"></div></div>
+        <div class="legend">
+          <span><i style="background:var(--t-ccgtA)"></i>Gas (tolto dal gas disponibile)</span>
+          <span><i style="background:var(--t-hydro)"></i>Idro a bacino e pompaggi (tolto)</span>
+          <span><i style="background:var(--t-coal)"></i>Carbone (tolto)</span>
+          <span><i style="background:var(--t-mr)"></i>Altre fonti, compreso "Other" (non tolto)</span>
+        </div>
+        <div class="readline" id="rm-read"></div>
+
+        <div class="sub">
+          <div class="rmbar">
+            <div><h3 id="rmtab-h">Le fermate</h3><p id="rmtab-p"></p></div>
+            <div class="rmctl">
+              <label class="rmshow">Impianti mostrati
+                <select id="rmshow">
+                  <option value="10" selected>Primi 10</option>
+                  <option value="all">Tutti</option>
+                </select>
+              </label>
+              <div class="seg" role="group" aria-label="Periodo della tabella" id="rmseg">
+                <button type="button" data-rm="ora" aria-pressed="true">Ora caricata</button>
+                <button type="button" data-rm="mese" aria-pressed="false">Tutto il mese</button>
+              </div>
+            </div>
+          </div>
+          <div class="tw"><table id="rmtab"></table></div>
+          <p class="rm-more" id="rm-more"></p>
+        </div>
+        <p class="note"><b>La fonte di ogni fermata viene dall'elenco delle unità (A71).</b> Nei messaggi A80 del NORD molti cicli combinati sono dichiarati come geotermico (B09) o senza fonte. Il modello usa la tecnologia della stessa unità nell'elenco ENTSO-E della capacità installata (A71), collegata con il codice EIC; in tabella, sotto la fonte, c'è quella dichiarata nel messaggio quando è diversa. Le unità che A71 elenca come "Other" restano nella fascia grigia e non riducono il parco a gas.</p>
+      </div>
+    </section>
+    <section class="sec" id="s0">
+      <h2><span class="n">9</span>Il mese reale: modello contro prezzo MGP del NORD</h2>
+      <p class="lede">Ogni ora del mese ricostruita con i dati veri di GME ed ENTSO-E: domanda, solare, eolico, idro fluente, gas disponibile, capacità di import, prezzi dei vicini, PSV ed EUA. La linea magenta è il prezzo MGP del NORD reale, quella blu è il prezzo che esce dalla stack del modello con quegli stessi input. Sotto, sullo stesso asse dei tempi, il carico residuo: la domanda che resta da coprire dopo solare ed eolico. Clicca su un punto di uno dei due grafici per caricare quell'ora in tutta la pagina.</p>
+      <div class="kpis" id="rkpis"></div>
+      <div class="chart"><div id="rchart"></div></div>
+      <div class="rleg"><span><i style="background:var(--signal)"></i>Prezzo MGP NORD reale</span><span><i style="background:var(--l-delta)"></i>Prezzo del modello</span></div>
+      <div class="chart chart-sub"><div id="rchart2"></div></div>
+      <div class="rleg"><span><i style="background:var(--t-nucI)"></i>Carico residuo: domanda − solare − eolico (GW)</span></div>
+      <p class="note" id="rnote"></p>
+    </section>
+  </main>
+</div>
+<script>
+(() => {
+'use strict';
+
+/* ---------- Parametri ---------- */
+const GAS_EF = 0.2016, COAL_EF = 0.34, COAL_MWH = 6.98;
+const SL = 0.1, CAP = 4000, HYD_SPREAD = 25, EXCH_SP = 20;
+const DR_CAP = 1.0, DR_PRICE = 450, OIL_CAP = 0.5, OIL_LO = 260, OIL_HI = 320;
+
+// Parco a gas del NORD in tre fasce di rendimento (quote del gas disponibile); il carbone ha la sua capacità
+const THERMAL = [
+  {id:'coal',  share:0,    eb:0.40, ew:0.36, fuel:'coal', ef:COAL_EF, efs:'0,34',   vom:5},
+  {id:'ccgtA', share:0.45, eb:0.58, ew:0.53, fuel:'gas',  ef:GAS_EF,  efs:'0,2016', vom:3},
+  {id:'ccgtB', share:0.40, eb:0.53, ew:0.46, fuel:'gas',  ef:GAS_EF,  efs:'0,2016', vom:3},
+  {id:'ocgt',  share:0.15, eb:0.40, ew:0.32, fuel:'gas',  ef:GAS_EF,  efs:'0,2016', vom:6},
+];
+const TH = Object.fromEntries(THERMAL.map(t => [t.id, t]));
+
+const TECH = {
+  mr:    {name:'Altre must-run',     long:'Bioenergie, rifiuti, geotermia, cogenerazione', col:'--t-mr'},
+  ror:   {name:'Idro fluente',       long:'Idro fluente',              col:'--t-ror'},
+  wind:  {name:'Eolico',             long:'Eolico',                    col:'--t-wind'},
+  solar: {name:'Solare',             long:'Fotovoltaico',              col:'--t-solar'},
+  coal:  {name:'Carbone',            long:'Carbone residuo',           col:'--t-coal'},
+  ccgtA: {name:'CCGT recenti',       long:'CCGT recenti',              col:'--t-ccgtA'},
+  ccgtB: {name:'CCGT meno efficienti',long:'CCGT meno efficienti',     col:'--t-ccgtB'},
+  hydro: {name:'Idro a bacino',      long:'Idro a bacino e pompaggi',  col:'--t-hydro'},
+  ocgt:  {name:'Turbogas',           long:'Turbogas e vecchi impianti a vapore', col:'--t-ocgt'},
+  oil:   {name:'Olio',               long:'Olio e altri combustibili', col:'--t-oil'},
+  dr:    {name:'Demand response',    long:'Demand response e interrompibili', col:'--t-dr'},
+  exch:  {name:'Estero',             long:'Scambi con i vicini',       col:'--t-exch'},
+};
+const ORDER = ['mr','ror','wind','solar','coal','ccgtA','ccgtB','hydro','ocgt','oil','dr'];
+
+const FACT = {
+  imp:  {label:'Import', long:'capacità di import', sul:'sulla capacità di import', al:'alla capacità di import', unit:'GW', lo:0, hi:12, H:0.5, sig:0.6, errR:3,
+         lede:'Tieni fermo tutto e muovi solo la capacità di import dall\'estero. È il rischio tipico delle frontiere del NORD: una linea fuori servizio o una capacità ridotta verso Svizzera o Francia.'},
+  gas:  {label:'Gas', long:'gas disponibile', sul:'sul gas disponibile', al:'al gas disponibile', unit:'GW', lo:5, hi:30, H:1, sig:0.8, errR:4,
+         lede:'Tieni fermo tutto e muovi solo la capacità a gas disponibile. Un CCGT che scatta o una fermata prorogata toglie una fascia della stack e sposta in alto l\'unità marginale.'},
+  sol:  {label:'Solare', long:'solare', sul:'sul solare', al:'al solare', unit:'GW', lo:0, hi:12, H:1, sig:1, errR:4,
+         lede:'Tieni fermo tutto e muovi solo il solare. Nelle ore centrali l\'errore di previsione sul solare è il rischio intraday più frequente del NORD.'},
+  temp: {label:'Temperatura', long:'scarto di temperatura', sul:'sulla temperatura', al:'alla temperatura', unit:'°C', lo:-8, hi:8, H:1, sig:1.5, errR:5,
+         lede:'Tieni fermo tutto e muovi solo la temperatura rispetto alla previsione. La domanda cambia della termosensibilità impostata in "Altre variabili".'},
+};
+
+const DEFAULTS = {psv:70, eua:85, dem:22, wind:0.1, sol:0, gas:20, coal:0, mr:1.6, ror:3, hyd:9, wv:150, pe:180, exp:3, imp:8, cn:2,
+  ts:0.5, fac:'imp', pos:-10, sig:0.6, hrs:12, dur:1, err:-1, api2:124, fx:1.15, mk:40};
+const PRESETS = [
+  {id:'base', name:'Base: ottobre feriale, ore 19', v:{}},
+  {id:'may',  name:'Domenica di maggio, ore 13', v:{dem:15, sol:9, wind:0.2, ror:6, hyd:7, wv:60, pe:40, imp:7, exp:3, cn:0.5, gas:18, ts:0.2, fac:'sol', sig:1, err:-1.5}},
+  {id:'cold', name:'Gennaio, sera fredda, ore 19', v:{dem:26, sol:0, ror:2, hyd:8, wv:180, pe:200, imp:8, cn:2.5, gas:21, ts:0.6, fac:'temp', sig:1.5, err:-2}},
+  {id:'heat', name:'Luglio, caldo, ore 21', v:{dem:24, sol:0.3, ror:4, hyd:7, wv:140, pe:170, imp:6, cn:3, gas:19, ts:-0.4, fac:'imp', sig:0.6, err:-1}},
+  {id:'y22',  name:'Stile 2022: gas a 150', v:{psv:150, eua:80, dem:23, pe:400, imp:7, wv:350, fac:'gas', sig:0.8, err:-1}},
+];
+
+const CTRL = [
+  {g:'main', id:'psv',  label:'PSV', unit:'€/MWh', min:10, max:200, step:0.5, dec:1, hint:'Prezzo del gas al punto di scambio virtuale italiano.'},
+  {g:'main', id:'eua',  label:'EUA', unit:'€/t', min:20, max:200, step:1, dec:0, hint:'Costo di una tonnellata di CO2.'},
+  {g:'main', id:'dem',  label:'Domanda NORD', unit:'GW', min:8, max:35, step:0.1, dec:1, hint:'Carico della zona nell\'ora.'},
+  {g:'main', id:'sol',  label:'Solare', unit:'GW', min:0, max:16, step:0.1, dec:1, hint:'Produzione solare della zona nell\'ora.'},
+  {g:'nuc',  id:'gas',  label:'Gas disponibile', unit:'GW', min:0, max:35, step:0.1, dec:1, hint:'Capacità a gas installata meno le indisponibilità dichiarate (REMIT).'},
+  {g:'nuc',  id:'imp',  label:'Capacità di import', unit:'GW', min:0, max:14, step:0.1, dec:1, hint:'Somma delle capacità day-ahead da Svizzera, Francia, Austria e Slovenia.'},
+  {g:'nuc',  id:'exp',  label:'Capacità di export', unit:'GW', min:0, max:10, step:0.1, dec:1},
+  {g:'nuc',  id:'pe',   label:'Prezzo dei vicini', unit:'€/MWh', min:0, max:500, step:1, dec:0, hint:'Media dei prezzi day-ahead di Francia e Svizzera.'},
+  {g:'nuc',  id:'cn',   label:'Export verso il Centro-Nord', unit:'GW', min:-6, max:8, step:0.1, dec:1, hint:'Flusso netto verso la zona Centro-Nord, preso dai dati: si somma alla domanda.'},
+  {g:'risk', id:'pos',  label:'Posizione', unit:'MW', min:-50, max:50, step:1, dec:0, hint:'Negativo significa corto: hai venduto energia.'},
+  {g:'risk', id:'sig',  label:'Incertezza a 24 h (1σ)', unit:'', min:0, max:8, step:0.1, dec:1, hint:'Deviazione standard dell\'errore di previsione, nell\'unità del fattore di rischio.'},
+  {g:'risk', id:'hrs',  label:'Ore alla consegna', unit:'h', min:0, max:36, step:0.5, dec:1, hint:'L\'incertezza si riduce con √(ore ÷ 24).'},
+  {g:'adv',  id:'ror',  label:'Idro fluente', unit:'GW', min:0, max:10, step:0.1, dec:1},
+  {g:'adv',  id:'hyd',  label:'Idro a bacino e pompaggi', unit:'GW', min:0, max:16, step:0.1, dec:1, hint:'Capacità disponibile nell\'ora.'},
+  {g:'adv',  id:'wv',   label:'Water value', unit:'€/MWh', min:10, max:400, step:1, dec:0, hint:'Il valore che i gestori danno all\'acqua dei bacini. L\'idro offre tra −25 e +25 attorno a questo valore.'},
+  {g:'adv',  id:'mr',   label:'Altre must-run', unit:'GW', min:0, max:5, step:0.1, dec:1, hint:'Bioenergie, rifiuti, geotermia e altre fonti che producono a qualunque prezzo.'},
+  {g:'adv',  id:'wind', label:'Eolico', unit:'GW', min:0, max:3, step:0.05, dec:2},
+  {g:'adv',  id:'coal', label:'Carbone disponibile', unit:'GW', min:0, max:4, step:0.1, dec:1},
+  {g:'adv',  id:'ts',   label:'Termosensibilità', unit:'GW/°C', min:-1, max:2, step:0.1, dec:1, hint:'GW di domanda in più per ogni grado in meno.'},
+  {g:'adv',  id:'api2', label:'API2', unit:'$/t', min:60, max:250, step:1, dec:0},
+  {g:'adv',  id:'fx',   label:'EUR/USD', unit:'', min:0.95, max:1.35, step:0.01, dec:2},
+  {g:'adv',  id:'mk',   label:'Margine di scarsità massimo', unit:'€/MWh', min:0, max:150, step:5, dec:0, hint:'Quanto gli operatori caricano sopra il costo quando il sistema è pieno.'},
+];
+
+const GLOSS = [
+  ['Merit order, stack', 'Gli impianti in fila per costo marginale crescente. Il sistema li chiama dal più economico finché la domanda è coperta.'],
+  ['Unità marginale', 'L\'ultimo impianto chiamato. Il suo costo fissa il prezzo che incassano tutti.'],
+  ['SRMC', 'Short Run Marginal Cost: il costo di produrre un MWh in più con un impianto già acceso. Combustibile più CO2 più VOM.'],
+  ['η (eta)', 'Rendimento dell\'impianto: MWh elettrici prodotti per MWh termici bruciati.'],
+  ['VOM', 'Variable Operating & Maintenance: costi variabili non legati al combustibile.'],
+  ['PSV', 'Punto di Scambio Virtuale: l\'hub italiano del gas, dove i CCGT del NORD comprano il combustibile.'],
+  ['EUA', 'European Union Allowance: il permesso di emettere una tonnellata di CO2.'],
+  ['API2, EUR/USD', 'Indice del carbone consegnato nell\'area Amsterdam-Rotterdam-Anversa, in $/t, e il cambio per convertirlo in euro.'],
+  ['MGP, MI-A', 'MGP è il mercato del giorno prima gestito dal GME; MI-A sono le aste infragiornaliere. Il prezzo NORD è il prezzo della zona Nord.'],
+  ['Zona NORD, Centro-Nord', 'Il mercato italiano è diviso in zone di prezzo. NORD confina con Svizzera, Francia, Austria, Slovenia e con la zona Centro-Nord.'],
+  ['Must-run', 'Produzione che resta accesa comunque: bioenergie, rifiuti, geotermia, cogenerazione.'],
+  ['Idro fluente, idro a bacino', 'Fluente: produce con l\'acqua che scorre, senza poterla accumulare. A bacino: accumula l\'acqua e la usa quando il prezzo la ripaga.'],
+  ['REMIT', 'Regolamento europeo che obbliga a pubblicare subito le informazioni che possono muovere i prezzi, come le indisponibilità delle centrali.'],
+  ['Water value', 'Il valore di un MWh d\'acqua se lo tieni per dopo. È il prezzo a cui offre l\'idro a bacino.'],
+  ['Capacità di scambio', 'La capacità di trasporto tra due zone messa a disposizione del mercato del giorno prima.'],
+  ['Export, import, spread', 'Export e import sono gli scambi con le zone vicine. Lo spread è la differenza di prezzo tra due zone.'],
+  ['CCGT, OCGT', 'Ciclo combinato a gas (efficiente) e turbogas a ciclo aperto (meno efficiente, rapido, copre i picchi).'],
+  ['Demand response', 'Consumatori pagati per ridurre il prelievo quando il prezzo è molto alto.'],
+  ['Termosensibilità', 'Di quanti GW cambia la domanda per ogni grado di temperatura.'],
+  ['Delta (Δ)', 'Di quanto cambia il P&L per un\'unità di movimento della variabile. È la pendenza.'],
+  ['Gamma (Γ)', 'Di quanto cambia il delta per un\'unità di movimento. È la curvatura.'],
+  ['Vega (ν)', 'Di quanto cambia il valore atteso della posizione se cresce l\'incertezza della previsione.'],
+  ['Theta (Θ)', 'Di quanto cambia il valore atteso della posizione quando passa un\'ora e l\'incertezza si riduce.'],
+  ['σ (sigma)', 'Deviazione standard dell\'errore di previsione.'],
+  ['E[P], premio di convessità', 'E[P] è il prezzo medio su tutti gli scenari possibili. Il premio di convessità è E[P] meno il prezzo dello scenario centrale.'],
+  ['P&L', 'Profit and Loss: il risultato economico della posizione.'],
+  ['XBID', 'La piattaforma europea del mercato infragiornaliero continuo.'],
+];
+
+/* ---------- Formattazione ---------- */
+const NF = {};
+function f(x, d = 1){
+  if (!Number.isFinite(x)) return '—';
+  if (Math.abs(x) < 0.5 * Math.pow(10, -d)) x = 0;
+  if (!NF[d]) NF[d] = new Intl.NumberFormat('it-IT', {minimumFractionDigits:d, maximumFractionDigits:d});
+  return NF[d].format(x).replace('-', '−');
+}
+function fs(x, d = 1){
+  const s = f(x, d);
+  if (s === '—') return s;
+  return (x > 0 && Math.abs(x) >= 0.5 * Math.pow(10, -d)) ? '+' + s : s;
+}
+function pc(x, d = 1){ return f(x * 100, d) + '%'; }
+function cls(x, eps = 0.005){ return x > eps ? 'v-pos' : x < -eps ? 'v-neg' : 'v-zero'; }
+function par(x, d){ return x < 0 ? '(' + f(x, d) + ')' : f(x, d); }
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ---------- Modello: stack e prezzo ---------- */
+function srmc(fp, eta, ef, eua, vom){ return fp / eta + ef * eua / eta + vom; }
+function addRange(S, t, cap, lo, hi){
+  if (cap <= 1e-9) return;
+  const n = Math.max(1, Math.round(cap / SL)), q = cap / n;
+  for (let i = 0; i < n; i++){ const fr = (i + 0.5) / n; S.push({t, q, fr, c:lo + (hi - lo) * fr}); }
+}
+function thermal(p){ return THERMAL.map(T => ({...T, cap: T.fuel === 'gas' ? Math.max(0, p.gas) * T.share : Math.max(0, p.coal)})); }
+function buildStack(p){
+  const coalTh = p.api2 / COAL_MWH / p.fx;
+  const S = [];
+  for (const T of thermal(p)){
+    if (T.cap <= 1e-9) continue;
+    const n = Math.max(1, Math.round(T.cap / SL)), q = T.cap / n, fp = T.fuel === 'gas' ? p.psv : coalTh;
+    for (let i = 0; i < n; i++){
+      const fr = (i + 0.5) / n, eta = T.eb - (T.eb - T.ew) * fr;
+      S.push({t:T.id, q, eta, fr, c:srmc(fp, eta, T.ef, p.eua, T.vom)});
+    }
+  }
+  addRange(S, 'hydro', p.hyd, Math.max(0, p.wv - HYD_SPREAD), p.wv + HYD_SPREAD);
+  addRange(S, 'oil', OIL_CAP, OIL_LO, OIL_HI);
+  addRange(S, 'dr', DR_CAP, DR_PRICE, DR_PRICE);
+  S.sort((a, b) => a.c - b.c);
+  const n = S.length, cum = new Float64Array(n), xm = new Float64Array(n), o = new Float64Array(n);
+  let acc = 0;
+  for (let i = 0; i < n; i++){ acc += S[i].q; cum[i] = acc; }
+  for (let i = 0; i < n; i++){ xm[i] = cum[i] - S[i].q / 2; o[i] = S[i].c + p.mk * Math.pow(xm[i] / acc, 3); }
+  return {S, cum, xm, o, total:acc, psv:p.psv, coalTh, mk:p.mk};
+}
+function markupAt(st, x){ return st.mk * Math.pow(clamp(x / st.total, 0, 1), 3); }
+function lastLE(o, P){
+  let lo = 0, hi = o.length - 1;
+  while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (o[mid] <= P) lo = mid; else hi = mid - 1; }
+  return lo;
+}
+function xAt(st, P){
+  const o = st.o, n = o.length;
+  if (!n || P < o[0]) return 0;
+  if (P >= o[n - 1]) return st.total;
+  const k = lastLE(o, P);
+  return st.xm[k] + (P - o[k]) / (o[k + 1] - o[k]) * (st.xm[k + 1] - st.xm[k]);
+}
+function nx(p, P){
+  if (P <= p.pe - EXCH_SP) return p.exp;
+  if (P >= p.pe + EXCH_SP) return -p.imp;
+  return P <= p.pe ? p.exp * (p.pe - P) / EXCH_SP : -p.imp * (P - p.pe) / EXCH_SP;
+}
+function idxAt(st, x){
+  let lo = 0, hi = st.S.length - 1;
+  while (lo < hi){ const mid = (lo + hi) >> 1; if (st.cum[mid] >= x - 1e-9) hi = mid; else lo = mid + 1; }
+  return lo;
+}
+function clear(p, st, Z, dem){
+  const g = P => Z + xAt(st, P) - dem - nx(p, P);
+  if (g(0) >= 0) return {price:0, zero:true, surplus:g(0), x:0, nx:nx(p, 0), kind:'zero'};
+  if (g(CAP) < 0) return {price:CAP, scarcity:true, x:st.total, nx:nx(p, CAP), kind:'scar'};
+  let lo = 0, hi = CAP;
+  for (let i = 0; i < 64; i++){ const m = (lo + hi) / 2; if (g(m) >= 0) hi = m; else lo = m; }
+  const P = hi, x = xAt(st, P), n = nx(p, P);
+  const inRamp = P > p.pe - EXCH_SP + 1e-6 && P < p.pe + EXCH_SP - 1e-6 && (p.exp > 0 || p.imp > 0);
+  const k = lastLE(st.o, P);
+  const gap = k < st.o.length - 1 ? st.o[k + 1] - st.o[k] : Infinity;
+  const idx = idxAt(st, x);
+  const sl = st.S[idx];
+  const kind = (inRamp && gap > 2) ? 'exch' : 'slice';
+  return {price:P, x, nx:n, kind, idx, slice:sl, srmc:sl ? sl.c : 0, mk:markupAt(st, x)};
+}
+function zeroOf(p){ return p.mr + p.ror + p.wind + p.sol; }
+function demTot(p){ return p.dem + p.cn; }
+
+function priceFn(p, st){
+  const Z = zeroOf(p), D = demTot(p);
+  switch (p.fac){
+    case 'imp': return x => clear({...p, imp:Math.max(0, x)}, st, Z, D).price;
+    case 'gas': return x => { const pp = {...p, gas:Math.max(0, x)}; return clear(pp, buildStack(pp), Z, D).price; };
+    case 'sol': return x => clear(p, st, Z - p.sol + Math.max(0, x), D).price;
+    default:    return x => clear(p, st, Z, D - p.ts * x).price;
+  }
+}
+function x0Of(p){ return p.fac === 'imp' ? p.imp : p.fac === 'gas' ? p.gas : p.fac === 'sol' ? p.sol : 0; }
+function clampX(fac, x){ return fac === 'temp' ? x : Math.max(0, x); }
+
+function expPrice(PX, fac, x0, sig){
+  if (sig <= 1e-9) return PX(x0);
+  const n = 120;
+  let acc = 0, wt = 0;
+  for (let i = 0; i <= n; i++){
+    const z = -4 + 8 * i / n, w = Math.exp(-z * z / 2);
+    acc += w * PX(clampX(fac, x0 + sig * z));
+    wt += w;
+  }
+  return acc / wt;
+}
+
+function computeAll(p){
+  const st = buildStack(p);
+  const Z = zeroOf(p);
+  const cl = clear(p, st, Z, demTot(p));
+  const E = p.pos * p.dur;
+  const F = FACT[p.fac], H = F.H;
+  const PX = priceFn(p, st), x0 = x0Of(p);
+  const P0 = cl.price, Pp = PX(clampX(p.fac, x0 + H)), Pm = PX(clampX(p.fac, x0 - H));
+  const hp = clampX(p.fac, x0 + H) - x0, hm = x0 - clampX(p.fac, x0 - H);
+  const dPdx = (hp + hm) > 0 ? (Pp - Pm) / (hp + hm) : 0;
+  const d2 = (hp > 0 && hm > 0) ? 2 * ((Pp - P0) / hp - (P0 - Pm) / hm) / (hp + hm) : 0;
+  const delta = E * dPdx, gamma = E * d2;
+
+  const cAt = pp => clear(pp, buildStack(pp), zeroOf(pp), demTot(pp)).price;
+  const PSp = cAt({...p, psv:p.psv + 1}), PSm = cAt({...p, psv:p.psv - 1});
+  const PEp = cAt({...p, eua:p.eua + 1}), PEm = cAt({...p, eua:p.eua - 1});
+  const dPdPSV = (PSp - PSm) / 2, dPdEUA = (PEp - PEm) / 2;
+
+  // import: sempre calcolato, serve alla sezione 3
+  const PI = x => clear({...p, imp:Math.max(0, x)}, st, Z, demTot(p)).price;
+  const ia = p.imp + 0.5, ib = Math.max(0, p.imp - 0.5);
+  const dPdImp = (PI(ia) - PI(ib)) / (ia - ib);
+
+  const sigOf = hrs => p.sig * Math.sqrt(Math.max(hrs, 0) / 24);
+  const sigEff = sigOf(p.hrs);
+  const EP = s => expPrice(PX, p.fac, x0, s);
+  const ep = EP(sigEff), prem = ep - P0, premApprox = 0.5 * d2 * sigEff * sigEff;
+  const V = s => E * (EP(s) - P0), V0 = E * prem;
+  const dsig = 0.25, sigA = sigEff + dsig, sigB = sigEff >= dsig ? sigEff - dsig : sigEff;
+  const Va = V(sigA), Vb = V(sigB), vega = (Va - Vb) / (sigA - sigB);
+  const sigT1 = sigOf(p.hrs - 1), VT1 = V(sigT1), theta = VT1 - V0;
+  const Pmsig = PX(clampX(p.fac, x0 - sigEff)), Ppsig = PX(clampX(p.fac, x0 + sigEff));
+
+  const x1 = clampX(p.fac, x0 + p.err), dx = x1 - x0, P1 = PX(x1);
+  const pnlReal = E * (P1 - P0), pnlD = delta * dx, pnlDG = delta * dx + 0.5 * gamma * dx * dx;
+
+  return {p, st, Z, cl, E, F, H, PX, x0, P0, Pp, Pm, hp, hm, dPdx, d2, delta, gamma,
+    PSp, PSm, PEp, PEm, dPdPSV, dPdEUA, PI, dPdImp,
+    sigEff, ep, prem, premApprox, V0, sigA, sigB, Va, Vb, vega, sigT1, VT1, theta, Pmsig, Ppsig,
+    x1, dx, P1, pnlReal, pnlD, pnlDG};
+}
+
+function dispatch(m){
+  const {p, st, cl, Z} = m;
+  const cap = {}, disp = {};
+  for (const t of ORDER){ cap[t] = 0; disp[t] = 0; }
+  cap.mr = p.mr; cap.ror = p.ror; cap.wind = p.wind; cap.solar = p.sol;
+  for (const s of st.S) cap[s.t] += s.q;
+  let rem = cl.zero ? Math.max(0, demTot(p) + cl.nx) : Z;
+  for (const t of ['mr', 'ror', 'wind', 'solar']){ const take = Math.min(cap[t], Math.max(0, rem)); disp[t] = take; rem -= take; }
+  if (!cl.zero){
+    let acc = 0;
+    for (let i = 0; i < st.S.length && acc < cl.x - 1e-9; i++){ const s = st.S[i], take = Math.min(s.q, cl.x - acc); disp[s.t] += take; acc += take; }
+  }
+  return {cap, disp};
+}
+
+/* ---------- Stato e controlli ---------- */
+const state = {...DEFAULTS};
+let activePreset = 'base';
+const $ = s => document.querySelector(s);
+
+function setPct(el){
+  const v = (parseFloat(el.value) - parseFloat(el.min)) / (parseFloat(el.max) - parseFloat(el.min)) * 100;
+  el.style.setProperty('--pct', v.toFixed(2) + '%');
+}
+function outText(c){
+  const v = state[c.id];
+  if (c.id === 'pos') return v === 0 ? '0 MW, flat' : `${fs(v, 0)} MW, ${v < 0 ? 'corto' : 'lungo'}`;
+  if (c.id === 'sig') return f(v, 1) + ' ' + FACT[state.fac].unit;
+  if (c.id === 'fl') return f(v, 0) + '% della norma';
+  return f(v, c.dec) + (c.unit ? ' ' + c.unit : '');
+}
+function errText(){ return fs(state.err, 1) + ' ' + FACT[state.fac].unit; }
+
+function ctlHTML(c){
+  return `<div class="ctl"><div class="ctl-top"><label for="in-${c.id}">${c.label}</label><output id="out-${c.id}" for="in-${c.id}"></output></div>` +
+    `<input type="range" id="in-${c.id}" min="${c.min}" max="${c.max}" step="${c.step}" value="${state[c.id]}">` +
+    (c.hint ? `<div class="ctl-hint">${c.hint}</div>` : '') + `</div>`;
+}
+function buildControls(){
+  for (const g of ['main', 'nuc', 'risk', 'adv']) $('#g-' + g).innerHTML = CTRL.filter(c => c.g === g).map(ctlHTML).join('');
+  $('#presets').innerHTML = PRESETS.map(pr => `<button type="button" data-preset="${pr.id}" aria-pressed="false">${pr.name}</button>`).join('');
+  $('#gls').innerHTML = GLOSS.map(([t, d]) => `<dt>${t}</dt><dd>${d}</dd>`).join('');
+}
+function syncControls(){
+  for (const c of CTRL){
+    const el = $('#in-' + c.id);
+    el.value = state[c.id];
+    setPct(el);
+    $('#out-' + c.id).textContent = outText(c);
+  }
+  const F = FACT[state.fac];
+  const e = $('#in-err');
+  e.min = -F.errR; e.max = F.errR;
+  e.value = state.err; setPct(e); $('#out-err').textContent = errText();
+  $('#err-lab').textContent = F.unit === '°C' ? 'Errore sulla temperatura' : 'Errore ' + F.sul;
+  $('#err-hint').textContent = F.unit === '°C' ? 'Temperatura realizzata meno prevista.' : 'Valore realizzato meno previsto, in GW.';
+  document.querySelectorAll('[data-dur]').forEach(b => b.setAttribute('aria-pressed', String(parseFloat(b.dataset.dur) === state.dur)));
+  document.querySelectorAll('[data-der]').forEach(b => b.setAttribute('aria-pressed', String(parseInt(b.dataset.der, 10) === state.der)));
+  document.querySelectorAll('[data-fac]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fac === state.fac)));
+  document.querySelectorAll('#presets button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === activePreset)));
+}
+
+let raf = 0;
+function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; render(); }); }
+
+/* ---------- Helper grafici ---------- */
+function niceStep(raw){
+  if (!(raw > 0)) return 1;
+  const e = Math.pow(10, Math.floor(Math.log10(raw))), r = raw / e;
+  return (r <= 1 ? 1 : r <= 2 ? 2 : r <= 2.5 ? 2.5 : r <= 5 ? 5 : 10) * e;
+}
+function niceRange(lo, hi, n){ const s = niceStep((hi - lo) / n); return {lo:Math.floor(lo / s) * s, hi:Math.ceil(hi / s) * s, step:s}; }
+function ticks(lo, hi, step){ const out = [], n = Math.round((hi - lo) / step); for (let i = 0; i <= n; i++) out.push(lo + i * step); return out; }
+function tdec(step){ return step >= 1 ? 0 : step >= 0.1 ? 1 : 2; }
+function sizeOf(el, ratio, minH, maxH){
+  const W = Math.max(300, Math.round(el.clientWidth || 720));
+  return {W, Hh:Math.round(Math.max(minH, Math.min(maxH, W * ratio)))};
+}
+const r1 = v => v.toFixed(1);
+const pl = (arr, X, Y) => arr.map(([x, y]) => r1(X(x)) + ',' + r1(Y(y))).join(' ');
+
+// Grafico a linee generico
+function plot(el, o){
+  const {W, Hh} = sizeOf(el, o.ratio || 0.46, o.minH || 260, o.maxH || 380);
+  const ml = 56, mr = 16, mt = 26, mb = 38, pw = W - ml - mr, ph = Hh - mt - mb;
+  let ymin = o.ymin, ymax = o.ymax;
+  if (ymin === undefined || ymax === undefined){
+    let a = Infinity, b = -Infinity;
+    for (const s of o.series) for (const [, y] of s.pts){ if (Number.isFinite(y) && Math.abs(y) < (o.yclip || 1e9)){ a = Math.min(a, y); b = Math.max(b, y); } }
+    for (const y of (o.yextra || [])) if (Number.isFinite(y) && Math.abs(y) < (o.yclip || 1e9)){ a = Math.min(a, y); b = Math.max(b, y); }
+    if (!Number.isFinite(a)){ a = 0; b = 1; }
+    if (b - a < 1e-6){ a -= 1; b += 1; }
+    const pad = (b - a) * 0.07;
+    if (ymin === undefined) ymin = o.floor0 ? Math.max(0, a - pad) : a - pad;
+    if (ymax === undefined) ymax = b + pad;
+  }
+  const yr = niceRange(ymin, ymax, o.yticks || 6);
+  const X = v => ml + (v - o.xlo) / (o.xhi - o.xlo) * pw;
+  const span = yr.hi - yr.lo;
+  const Y = v => mt + ph - (clamp(v, yr.lo - 0.04 * span, yr.hi + 0.04 * span) - yr.lo) / span * ph;
+  const id = 'cp' + el.id;
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${o.aria || ''}"><defs><clipPath id="${id}"><rect x="${ml}" y="${mt}" width="${pw}" height="${ph}"/></clipPath></defs>`;
+  const yd = tdec(yr.step);
+  for (const t of ticks(yr.lo, yr.hi, yr.step)) s += `<line class="gl" x1="${ml}" x2="${W - mr}" y1="${r1(Y(t))}" y2="${r1(Y(t))}"/><text class="tk" x="${ml - 8}" y="${r1(Y(t) + 4)}" text-anchor="end">${f(t, yd)}</text>`;
+  const xs = o.xstep || niceStep((o.xhi - o.xlo) / (W < 560 ? 5 : 9));
+  const xd = tdec(xs);
+  for (let q = Math.ceil(o.xlo / xs - 1e-9) * xs; q <= o.xhi + 1e-9; q += xs) s += `<text class="tk" x="${r1(X(q))}" y="${r1(mt + ph + 18)}" text-anchor="middle">${f(q, xd)}</text>`;
+  s += `<text class="axl" x="8" y="${mt - 10}">${o.ylab || ''}</text><text class="axl" x="${W - mr}" y="${Hh - 3}" text-anchor="end">${o.xlab || ''}</text>`;
+  if (yr.lo < 0 && yr.hi > 0) s += `<line class="axis0" x1="${ml}" x2="${W - mr}" y1="${r1(Y(0))}" y2="${r1(Y(0))}"/>`;
+  else s += `<line class="axis0" x1="${ml}" x2="${W - mr}" y1="${r1(mt + ph)}" y2="${r1(mt + ph)}"/>`;
+  let g = o.under ? o.under(X, Y, {ml, mt, pw, ph}) : '';
+  for (const se of o.series){
+    g += `<polyline points="${pl(se.pts, X, Y)}" fill="none" style="stroke:${se.color}" stroke-width="${se.w || 2}" ${se.dash ? `stroke-dasharray="${se.dash}"` : ''} stroke-linejoin="round" stroke-linecap="round" ${se.op ? `opacity="${se.op}"` : ''}/>`;
+  }
+  s += `<g clip-path="url(#${id})">${g}</g>`;
+  if (o.over) s += o.over(X, Y, {ml, mt, pw, ph, W, mr});
+  s += `</svg>`;
+  el.innerHTML = s;
+}
+
+/* ---------- Render: stack ---------- */
+let stackGeom = null, lastM = null;
+
+function renderStack(m){
+  const el = $('#stack');
+  const {W, Hh} = sizeOf(el, 0.52, 300, 440);
+  const ml = 52, mr = 14, mt = 44, mb = 36, pw = W - ml - mr, ph = Hh - mt - mb;
+  const {p, st, cl, Z} = m;
+  const XMAX = clamp(Math.ceil((Z + st.total) / 5) * 5, 20, 80);
+  const X = q => ml + clamp(q, 0, XMAX) / XMAX * pw;
+  let top = 180;
+  for (let i = 0; i < st.S.length; i++) if (st.S[i].t === 'ocgt' || st.S[i].t === 'hydro') top = Math.max(top, st.o[i]);
+  if (cl.price < CAP) top = Math.max(top, cl.price);
+  top = Math.min(Math.max(top, p.pe + EXCH_SP), 700);
+  const yr = niceRange(0, top * 1.05, 6), ymax = yr.hi;
+  const Y = v => mt + ph - clamp(v, 0, ymax) / ymax * ph;
+  const y0 = Y(0);
+  const Dtot = demTot(p) + cl.nx, xd = X(Dtot), xdom = X(demTot(p));
+  stackGeom = {W, Hh, ml, pw, mt, y0, xmax:XMAX};
+
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Curva di offerta del NORD con domanda, import e prezzo">`;
+  s += `<defs><clipPath id="cpS"><rect x="${ml}" y="${mt - 2}" width="${pw}" height="${ph + 2}"/></clipPath>` +
+       `<clipPath id="cpD"><rect x="${ml - 1}" y="${mt - 2}" width="${Math.max(0, X(Z + (cl.zero ? 0 : cl.x)) - ml + 1)}" height="${ph + 4}"/></clipPath></defs>`;
+  for (const t of ticks(0, ymax, yr.step)) s += `<line class="gl" x1="${ml}" x2="${W - mr}" y1="${r1(Y(t))}" y2="${r1(Y(t))}"/><text class="tk" x="${ml - 8}" y="${r1(Y(t) + 4)}" text-anchor="end">${f(t, 0)}</text>`;
+  const xs = W < 560 ? 10 : 5;
+  for (let q = 0; q <= XMAX; q += xs) s += `<text class="tk" x="${r1(X(q))}" y="${r1(y0 + 18)}" text-anchor="middle">${q}</text>`;
+  s += `<text class="axl" x="8" y="${mt - 16}">€/MWh</text><text class="axl" x="${W - mr}" y="${Hh - 3}" text-anchor="end">GW cumulati</text>`;
+
+  // blocco a costo zero
+  const zero = [['mr', p.mr], ['ror', p.ror], ['wind', p.wind], ['solar', p.sol]];
+  let a = 0, zs = '', zl = '';
+  for (const [t, q] of zero){
+    if (q <= 1e-9) continue;
+    zs += `<rect x="${r1(X(a))}" y="${r1(y0 - 12)}" width="${r1(Math.max(0, X(a + q) - X(a)))}" height="12" style="fill:var(${TECH[t].col})"/>`;
+    if (X(a + q) - X(a) > 66) zl += `<text class="lb-m halo" x="${r1((X(a) + X(a + q)) / 2)}" y="${r1(y0 - 18)}" text-anchor="middle">${TECH[t].name} ${f(q, 1)}</text>`;
+    a += q;
+  }
+  // offerte
+  let shapes = '', edge = `M${r1(X(Z))},${r1(y0)}`, cur = null;
+  a = Z;
+  const flush = () => { if (cur) shapes += `<path d="${cur.d} L${r1(X(cur.b))},${r1(y0)} Z" style="fill:var(${TECH[cur.t].col})"/>`; };
+  for (let i = 0; i < st.S.length; i++){
+    const sl = st.S[i], b = Z + st.cum[i];
+    if (a >= XMAX) break;
+    const yy = r1(Y(st.o[i]));
+    if (!cur || cur.t !== sl.t){ flush(); cur = {t:sl.t, d:`M${r1(X(a))},${r1(y0)} L${r1(X(a))},${yy}`, b}; }
+    cur.d += ` L${r1(X(a))},${yy} L${r1(X(b))},${yy}`;
+    cur.b = b;
+    edge += ` L${r1(X(a))},${yy} L${r1(X(b))},${yy}`;
+    a = b;
+  }
+  flush();
+  s += `<g clip-path="url(#cpS)"><g opacity=".24">${shapes}</g><g clip-path="url(#cpD)">${shapes}</g>` +
+       `<path d="${edge}" fill="none" style="stroke:var(--ink)" stroke-width="1" opacity=".5"/></g>`;
+  s += `<line class="axis0" x1="${ml}" x2="${W - mr}" y1="${r1(y0)}" y2="${r1(y0)}"/>`;
+  s += zs + zl;
+
+  // prezzo dei vicini
+  if (p.pe < ymax){
+    s += `<line x1="${ml}" x2="${W - mr}" y1="${r1(Y(p.pe))}" y2="${r1(Y(p.pe))}" style="stroke:var(--t-exch)" stroke-width="1.4" stroke-dasharray="2 4"/>`;
+    s += `<text class="lb-m halo" x="${W - mr - 4}" y="${r1(Y(p.pe) - 6)}" text-anchor="end">Prezzo dei vicini ${f(p.pe, 0)}</text>`;
+  }
+  // domanda interna e totale
+  s += `<line x1="${r1(xdom)}" x2="${r1(xdom)}" y1="${mt + 20}" y2="${r1(y0)}" style="stroke:var(--muted)" stroke-width="1.4" stroke-dasharray="6 4"/>`;
+  s += `<line x1="${r1(xd)}" x2="${r1(xd)}" y1="${mt - 6}" y2="${r1(y0)}" style="stroke:var(--ink)" stroke-width="1.8"/>`;
+  const exLab = cl.nx >= 0 ? `Domanda + export ${f(Dtot, 1)} GW` : `Domanda − import ${f(Dtot, 1)} GW`;
+  const dlx = clamp(xd, ml + 80, W - mr - 80);
+  s += `<text class="lb halo" x="${r1(dlx)}" y="${mt - 14}" text-anchor="middle">${exLab}</text>`;
+  if (Math.abs(xd - xdom) > 4){
+    const lx = clamp(xdom, ml + 60, W - mr - 60);
+    s += `<text class="lb-m halo" x="${r1(lx + (xdom < xd ? -6 : 6))}" y="${mt + 14}" text-anchor="${xdom < xd ? 'end' : 'start'}">${Math.abs(p.cn) > 0.05 ? 'Domanda + Centro-Nord' : 'Domanda NORD'} ${f(demTot(p), 1)}</text>`;
+  }
+
+  if (cl.scarcity){
+    s += `<text class="lb-s halo" x="${r1(ml + pw / 2)}" y="${mt + 40}" text-anchor="middle">Scarsità: prezzo al tetto di ${f(CAP, 0)} €/MWh</text>`;
+  } else {
+    const yp = Y(cl.price), xc = X(Z + (cl.zero ? 0 : cl.x));
+    s += `<line x1="${ml}" x2="${r1(xc)}" y1="${r1(yp)}" y2="${r1(yp)}" style="stroke:var(--signal)" stroke-width="1.6" stroke-dasharray="4 4"/>`;
+    s += `<circle cx="${r1(cl.zero ? xd : xc)}" cy="${r1(yp)}" r="5.5" style="fill:var(--signal);stroke:var(--panel)" stroke-width="2"/>`;
+    const low = yp > y0 - 34;
+    const ly = low ? y0 - 40 : (yp - 8 < mt + 30) ? yp + 18 : yp - 8;
+    s += `<text class="lb-s halo" x="${ml + 8}" y="${r1(ly)}">Prezzo ${f(cl.price, 1)} €/MWh</text>`;
+    const mlab = marginalLabel(m, true);
+    const xm = cl.zero ? xd : xc, right = xm < W - mr - 220;
+    s += `<text class="lb halo" x="${r1(right ? xm + 11 : xm - 11)}" y="${r1(low ? y0 - 60 : yp + 18)}" text-anchor="${right ? 'start' : 'end'}">${mlab}</text>`;
+  }
+  s += `</svg>`;
+  el.innerHTML = s;
+
+  const present = new Set(['mr']);
+  if (p.ror > 0) present.add('ror');
+  if (p.wind > 0) present.add('wind');
+  if (p.sol > 0) present.add('solar');
+  for (const sl of st.S) present.add(sl.t);
+  $('#legend').innerHTML = ORDER.filter(t => present.has(t)).map(t => `<span><i style="background:var(${TECH[t].col})"></i>${TECH[t].name}</span>`).join('') +
+    `<span><i class="ln dot" style="border-color:var(--t-exch)"></i>Prezzo dei vicini</span>`;
+}
+
+function marginalLabel(m, withEta){
+  const {cl} = m;
+  if (cl.zero) return 'Eccesso di offerta';
+  if (cl.scarcity) return 'Nessuna, scarsità';
+  if (cl.kind === 'exch') return cl.nx >= 0 ? 'Export verso i vicini' : 'Import dai vicini';
+  const sl = cl.slice;
+  return TECH[sl.t].name + (withEta && sl.eta ? `, η ${pc(sl.eta, 1)}` : '');
+}
+
+function sliceInfo(m, q){
+  const {p, st, Z, cl} = m;
+  const served = demTot(p) + cl.nx;
+  const tag = q <= Z + (cl.zero ? 0 : cl.x) + 1e-9 ? 'In merito: produce' : 'Fuori merito: non produce';
+  const zero = [['mr', p.mr], ['ror', p.ror], ['wind', p.wind], ['solar', p.sol]];
+  let a = 0;
+  for (const [t, w] of zero){
+    if (q < a + w) return `<b>${TECH[t].long}</b><br>Costo marginale circa 0 €/MWh<br>${cl.zero && q > served ? 'In eccesso: va tagliato o esportato' : 'Produce'}`;
+    a += w;
+  }
+  const dq = q - Z;
+  if (dq > st.total) return `<b>Oltre la capacità</b><br>Tetto di prezzo ${f(CAP, 0)} €/MWh`;
+  const i = idxAt(st, dq), s = st.S[i];
+  let body;
+  if (s.eta) body = `Rendimento η ${pc(s.eta, 1)}<br>SRMC ${f(s.c, 1)} €/MWh`;
+  else if (s.t === 'hydro') body = `Costo opportunità dell'acqua ${f(s.c, 1)} €/MWh`;
+  else body = `Prezzo base ${f(s.c, 0)} €/MWh`;
+  return `<b>${TECH[s.t].long}</b><br>${body}<br>Margine ${f(st.o[i] - s.c, 1)}, offerta ${f(st.o[i], 1)} €/MWh<br>A ${f(q, 1)} GW sulla curva<br>${tag}`;
+}
+
+function bindTooltip(){
+  const wrap = $('#stackwrap'), tip = $('#tip');
+  const hide = () => tip.classList.remove('on');
+  wrap.addEventListener('pointermove', e => {
+    const svg = wrap.querySelector('svg');
+    if (!svg || !stackGeom || !lastM) return;
+    const r = svg.getBoundingClientRect();
+    const vx = (e.clientX - r.left) / r.width * stackGeom.W;
+    const vy = (e.clientY - r.top) / r.height * stackGeom.Hh;
+    const q = (vx - stackGeom.ml) / stackGeom.pw * stackGeom.xmax;
+    if (q < 0 || q > stackGeom.xmax || vy < stackGeom.mt - 4 || vy > stackGeom.y0 + 4){ hide(); return; }
+    tip.innerHTML = sliceInfo(lastM, q);
+    const wr = wrap.getBoundingClientRect();
+    tip.style.left = clamp(e.clientX - wr.left, 100, wr.width - 100) + 'px';
+    tip.style.top = (e.clientY - wr.top) + 'px';
+    tip.classList.add('on');
+  });
+  wrap.addEventListener('pointerleave', hide);
+}
+
+/* ---------- Render: KPI, formula, tabella ---------- */
+function exchText(n){ return n >= 0 ? `${f(n, 1)} GW export` : `${f(-n, 1)} GW import`; }
+function renderKPIs(m){
+  const {cl, p} = m;
+  $('#kpis').innerHTML =
+    `<div class="kpi"><span>Prezzo NORD</span><b>${f(cl.price, 1)} <small>€/MWh</small></b></div>` +
+    `<div class="kpi"><span>Unità marginale</span><b>${marginalLabel(m, false)}</b></div>` +
+    `<div class="kpi"><span>Gas disponibile</span><b>${f(p.gas, 1)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Saldo con l'estero</span><b>${exchText(cl.nx)}</b></div>`;
+}
+function stackFormula(m){
+  const {p, st, cl, Z} = m;
+  const mk = `<br><span class="l">Offerta = costo + margine di scarsità</span> = ${f(cl.srmc, 2)} + ${f(cl.mk, 2)} = <b>${f(cl.srmc + cl.mk, 2)} €/MWh</b>`;
+  if (cl.zero) return `<span class="l">Eccesso di offerta:</span> il blocco a costo zero (${f(Z, 1)} GW) supera domanda più export (${f(demTot(p) + cl.nx, 1)} GW) di ${f(cl.surplus, 1)} GW. Prezzo a 0 €/MWh nel modello.`;
+  if (cl.scarcity) return `<span class="l">Domanda oltre la capacità:</span> prezzo al tetto di ${f(CAP, 0)} €/MWh.`;
+  if (cl.kind === 'exch') return `<span class="l">Lo scambio con l'estero è marginale:</span> nel NORD non c'è offerta tra ${f(st.o[lastLE(st.o, cl.price)], 1)} e ${f(st.o[Math.min(st.o.length - 1, lastLE(st.o, cl.price) + 1)], 1)} €/MWh, quindi il prezzo si ferma dove l'${cl.nx >= 0 ? 'export' : 'import'} pareggia i conti.` +
+    `<br><span class="l">Saldo = ${cl.nx >= 0 ? 'export pieno × (prezzo vicini − P) ÷ 20' : 'import pieno × (P − prezzo vicini) ÷ 20'}</span> = ${exchText(cl.nx)} a P = <b>${f(cl.price, 2)} €/MWh</b>, ${fs(cl.price - p.pe, 1)} rispetto ai vicini.`;
+  const sl = cl.slice;
+  if (sl.eta){
+    const T = TH[sl.t], gas = T.fuel === 'gas', fp = gas ? st.psv : st.coalTh;
+    return `<span class="l">SRMC = ${gas ? 'PSV' : 'Carbone'} ÷ η + (EUA × ${T.efs}) ÷ η + VOM</span> = ${f(fp, 2)} ÷ ${f(sl.eta, 3)} + (${f(p.eua, 0)} × ${T.efs}) ÷ ${f(sl.eta, 3)} + ${f(T.vom, 0)} = ${f(sl.c, 2)}` + mk;
+  }
+  if (sl.t === 'hydro') return `<span class="l">L'idro a bacino è marginale:</span> offre al water value, non a un costo di combustibile. Costo = ${f(p.wv, 0)} − 25 + 50 × ${f(sl.fr, 2)} = ${f(sl.c, 2)}` + mk;
+  if (sl.t === 'oil') return `<span class="l">L'olio è marginale:</span> costo ${f(sl.c, 2)}` + mk;
+  return `<span class="l">La demand response è marginale:</span> costo ${f(sl.c, 0)}` + mk;
+}
+
+function renderTech(m){
+  const {p, st, cl} = m;
+  const {cap, disp} = dispatch(m);
+  let margT = cl.kind === 'slice' && cl.slice ? cl.slice.t : null;
+  const rows = ORDER.map(t => {
+    if (cap[t] <= 1e-9 && !['mr', 'ror'].includes(t)) return '';
+    let eta = '—', fuel = '—', ef = '—', vom = '—', cost = '—';
+    if (TH[t]){
+      const T = TH[t], fp = T.fuel === 'gas' ? st.psv : st.coalTh;
+      eta = `${pc(T.eb, 0)} → ${pc(T.ew, 0)}`;
+      fuel = T.fuel === 'gas' ? `PSV ${f(fp, 2)}` : `Carbone ${f(fp, 2)}`;
+      ef = T.efs; vom = f(T.vom, 0);
+      cost = `${f(srmc(fp, T.eb, T.ef, p.eua, T.vom), 1)} → ${f(srmc(fp, T.ew, T.ef, p.eua, T.vom), 1)}`;
+    } else if (t === 'hydro'){ fuel = 'Acqua'; cost = `${f(Math.max(0, p.wv - HYD_SPREAD), 0)} → ${f(p.wv + HYD_SPREAD, 0)}`; }
+    else if (t === 'oil'){ fuel = 'Olio'; cost = `${f(OIL_LO, 0)} → ${f(OIL_HI, 0)}`; }
+    else if (t === 'dr'){ fuel = 'Fisso'; cost = f(DR_PRICE, 0); }
+    else cost = '≈ 0';
+    let badge;
+    if (t === margT) badge = '<span class="st m">Marginale</span>';
+    else if (cl.zero && disp[t] < cap[t] - 1e-6 && ['wind', 'solar', 'ror'].includes(t)) badge = '<span class="st">In eccesso</span>';
+    else if (disp[t] >= cap[t] - 1e-6 && cap[t] > 0) badge = '<span class="st in">In merito</span>';
+    else if (disp[t] <= 1e-6) badge = '<span class="st">Fuori merito</span>';
+    else badge = '<span class="st in">In parte</span>';
+    return `<tr${t === margT ? ' class="hl"' : ''}><td><span class="sw" style="background:var(${TECH[t].col})"></span>${TECH[t].long}</td>` +
+      `<td class="num">${f(cap[t], 1)}</td><td class="num">${f(disp[t], 1)}</td><td class="num">${eta}</td><td>${fuel}</td>` +
+      `<td class="num">${ef}</td><td class="num">${vom}</td><td class="num">${cost}</td><td>${badge}</td></tr>`;
+  }).join('');
+  const exRow = `<tr${cl.kind === 'exch' ? ' class="hl"' : ''}><td><span class="sw" style="background:var(--t-exch)"></span>Scambi con i vicini</td>` +
+    `<td class="num">${f(p.exp, 1)} / ${f(p.imp, 1)}</td><td class="num">${exchText(cl.nx)}</td><td class="num">—</td><td>Estero</td><td class="num">—</td><td class="num">—</td>` +
+    `<td class="num">${f(p.pe, 0)} ± ${EXCH_SP}</td><td>${cl.kind === 'exch' ? '<span class="st m">Marginale</span>' : '<span class="st in">Attivo</span>'}</td></tr>`;
+  $('#tech').innerHTML = `<thead><tr><th>Tecnologia</th><th class="num">GW disponibili</th><th class="num">GW in produzione</th><th class="num">η migliore → peggiore</th>` +
+    `<th>Input, €/MWh<sub>th</sub></th><th class="num">tCO2 per MWh<sub>th</sub></th><th class="num">VOM</th><th class="num">Costo o offerta base, €/MWh</th><th>Stato</th></tr></thead><tbody>${rows}${exRow}</tbody>`;
+}
+
+/* ---------- Render: sezione frontiere ---------- */
+const CONFINI = [['CH', 'Svizzera'], ['FR', 'Francia'], ['AT', 'Austria'], ['SI', 'Slovenia']];
+function renderImp(m){
+  const {p, cl, PI, dPdImp} = m;
+  const imp = cl.nx < 0 ? -cl.nx : 0, libera = Math.max(0, p.imp - imp);
+  $('#ikpi').innerHTML =
+    `<div class="kpi"><span>Capacità di import</span><b>${f(p.imp, 1)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Import nel modello</span><b>${f(imp, 1)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Prezzo dei vicini</span><b>${f(p.pe, 0)} <small>€/MWh</small></b></div>` +
+    `<div class="kpi"><span>Spread NORD − vicini</span><b>${fs(cl.price - p.pe, 1)} <small>€/MWh</small></b></div>` +
+    `<div class="kpi"><span>1 GW di import in meno</span><b>${fs(-dPdImp, 1)} <small>€/MWh</small></b></div>`;
+
+  // frontiere dall'ora reale caricata
+  const r = (REAL && realSel !== null) ? REAL.righe[realSel] : null;
+  if (!r){
+    $('#itab').innerHTML = `<tbody><tr><td class="wrap">Carica un'ora reale dal pannello per vedere flussi e capacità di ogni frontiera.</td></tr></tbody>`;
+  } else {
+    const gv = c => rv(r, c);
+    const riga = (nome, fl, cap) => {
+      const uso = (fl !== null && cap) ? Math.max(0, fl) / cap : null;
+      return `<tr><td>${nome}</td><td class="num">${fl === null ? '—' : fs(fl, 2)}</td><td class="num">${cap === null ? '—' : f(cap, 2)}</td>` +
+        `<td class="num">${uso === null ? '—' : pc(uso, 0)}</td></tr>`;
+    };
+    let tf = 0, tc = 0;
+    const rows = CONFINI.map(([k, nome]) => { const fl = gv('flusso_' + k), cap = gv('capimp_' + k); tf += fl || 0; tc += cap || 0; return riga(nome, fl, cap); }).join('');
+    $('#itab').innerHTML = `<thead><tr><th>Frontiera</th><th class="num">Flusso netto, GW</th><th class="num">Capacità di import, GW</th><th class="num">Uso della capacità</th></tr></thead><tbody>${rows}` +
+      `<tr class="tot"><td>Estero</td><td class="num">${fs(tf, 2)}</td><td class="num">${f(tc, 2)}</td><td class="num">${tc ? pc(Math.max(0, tf) / tc, 0) : '—'}</td></tr>` +
+      riga('Centro-Nord', gv('flusso_IT_CNOR'), null) + `</tbody>`;
+  }
+
+  // prezzo in funzione della capacità di import
+  const el = $('#iprice');
+  const hi = Math.max(10, Math.ceil(p.imp + 3)), pts = [];
+  for (let x = 0; x <= hi + 1e-9; x += 0.1) pts.push([x, PI(x)]);
+  const tang = [];
+  if (cl.price < CAP){ const a = Math.max(0, p.imp - 2), b = Math.min(hi, p.imp + 2); tang.push([a, cl.price + dPdImp * (a - p.imp)], [b, cl.price + dPdImp * (b - p.imp)]); }
+  const series = [{pts, color:'var(--t-exch)', w:2.4}];
+  if (tang.length) series.push({pts:tang, color:'var(--l-delta)', w:1.8, dash:'7 5'});
+  plot(el, {xlo:0, xhi:hi, xstep:hi > 12 ? 2 : 1, ylab:'€/MWh', xlab:'Capacità di import, GW', floor0:true, yclip:900, yextra:[cl.price], aria:'Prezzo del NORD in funzione della capacità di import',
+    series, ratio:0.42, minH:250, maxH:360,
+    over:(X, Y, g) => {
+      let o = `<circle cx="${r1(X(p.imp))}" cy="${r1(Y(cl.price))}" r="5.5" style="fill:var(--signal);stroke:var(--panel)" stroke-width="2"/>`;
+      const right = X(p.imp) < g.ml + g.pw - 190;
+      o += `<text class="lb-s halo" x="${r1(X(p.imp) + (right ? 12 : -12))}" y="${r1(Math.max(g.mt + 14, Y(cl.price) - 10))}" text-anchor="${right ? 'start' : 'end'}">${f(p.imp, 1)} GW, ${f(cl.price, 1)} €/MWh</text>`;
+      return o;
+    }});
+  const meno = 2, Pm2 = PI(Math.max(0, p.imp - meno));
+  $('#iprice-read').innerHTML =
+    `<div><span>1 GW di capacità di import in meno qui vale</span> <b>${fs(-dPdImp, 1)} €/MWh</b></div>` +
+    `<div><span>Capacità di import ancora libera</span> <b>${f(libera, 1)} GW</b></div>` +
+    `<div><span>Con ${meno} GW di capacità in meno il prezzo sarebbe</span> <b>${f(Pm2, 1)} €/MWh</b></div>`;
+
+  // stato della frontiera
+  const spread = cl.price - p.pe;
+  let head, body;
+  if (cl.nx <= -p.imp + 1e-6 && p.imp > 0){ head = 'Import al massimo: la frontiera è satura'; body = `Il NORD costa ${f(spread, 1)} €/MWh più dei vicini e usa tutti i ${f(p.imp, 1)} GW di capacità. Qui il prezzo lo fa l'offerta interna (marginale: ${marginalLabel(m, false)}): un GW di capacità in più o in meno sposta direttamente l'unità marginale.`; }
+  else if (cl.nx < -1e-6){ head = 'Frontiera non satura: il NORD è agganciato ai vicini'; body = `Il NORD importa ${f(-cl.nx, 1)} GW su ${f(p.imp, 1)} disponibili. Finché resta capacità libera, il prezzo del NORD resta vicino a quello dei vicini (${f(p.pe, 0)} €/MWh) e gli shock interni vengono assorbiti in parte dall'import.`; }
+  else { head = 'Il NORD esporta o è in equilibrio'; body = `Il NORD costa ${f(-spread, 1)} €/MWh meno dei vicini: l'import si ferma e l'energia esce verso l'estero, fino a ${f(p.exp, 1)} GW di capacità di export.`; }
+  $('#iverdict').innerHTML = `<div class="verdict"><b class="big">${head}</b>${body}</div>`;
+}
+
+/* ---------- Render: prezzo in funzione del fattore ---------- */
+function renderPS(m){
+  const {p, F, PX, x0, P0, dPdx, sigEff, ep} = m;
+  $('#ps-lede').textContent = F.lede + ' La pendenza nel punto in cui sei è il delta, quanto la curva si piega è il gamma. La fascia grigia è l\'incertezza: se la curva è convessa, il prezzo atteso E[P] sta sopra il prezzo dello scenario centrale P(x).';
+  const el = $('#ps');
+  const pts = [], step = (F.hi - F.lo) / 240;
+  for (let i = 0; i <= 240; i++){ const x = F.lo + i * step; pts.push([x, PX(x)]); }
+  const tang = [];
+  if (P0 < CAP){ const w = (F.hi - F.lo) * 0.16, a = Math.max(F.lo, x0 - w), b = Math.min(F.hi, x0 + w); tang.push([a, P0 + dPdx * (a - x0)], [b, P0 + dPdx * (b - x0)]); }
+  const series = [{pts, color:'var(--ink)', w:2.2}];
+  if (tang.length) series.push({pts:tang, color:'var(--l-delta)', w:1.8, dash:'7 5'});
+  plot(el, {xlo:F.lo, xhi:F.hi, ylab:'€/MWh', xlab:(F.unit === '°C' ? 'Scarto di temperatura, °C' : F.label + ', GW'), floor0:true, yclip:900, yextra:[P0, ep], aria:'Prezzo in funzione del fattore di rischio',
+    series, ratio:0.46, minH:270, maxH:390,
+    under:(X, Y, g) => {
+      if (sigEff <= 0.01) return '';
+      return `<rect class="band2" x="${r1(X(x0 - 2 * sigEff))}" y="${g.mt}" width="${r1(X(x0 + 2 * sigEff) - X(x0 - 2 * sigEff))}" height="${g.ph}"/>` +
+             `<rect class="band1" x="${r1(X(x0 - sigEff))}" y="${g.mt}" width="${r1(X(x0 + sigEff) - X(x0 - sigEff))}" height="${g.ph}"/>`;
+    },
+    over:(X, Y, g) => {
+      if (P0 >= CAP) return '';
+      const xs = X(clamp(x0, F.lo, F.hi));
+      let o = '';
+      if (ep < CAP) o += `<line x1="${r1(xs - 16)}" x2="${r1(xs + 16)}" y1="${r1(Y(ep))}" y2="${r1(Y(ep))}" style="stroke:var(--signal)" stroke-width="3"/>`;
+      o += `<circle cx="${r1(xs)}" cy="${r1(Y(P0))}" r="5" style="fill:var(--ink);stroke:var(--panel)" stroke-width="2"/>`;
+      const left = xs - g.ml > 150;
+      o += left ? `<text class="lb halo" x="${r1(xs - 22)}" y="${r1(Y(P0) + 4)}" text-anchor="end">P(x) = ${f(P0, 1)}</text>`
+                : `<text class="lb halo" x="${r1(xs + 22)}" y="${r1(Y(P0) + 20)}">P(x) = ${f(P0, 1)}</text>`;
+      if (ep < CAP && Math.abs(ep - P0) > 0.05){
+        const right = g.ml + g.pw - xs > 150;
+        o += right ? `<text class="lb-s halo" x="${r1(xs + 22)}" y="${r1(Y(ep) + 4)}">E[P] = ${f(ep, 1)}</text>`
+                   : `<text class="lb-s halo" x="${r1(xs - 22)}" y="${r1(Y(ep) - 8)}" text-anchor="end">E[P] = ${f(ep, 1)}</text>`;
+      }
+      return o;
+    }});
+  $('#ps-read').innerHTML =
+    `<div><span>Pendenza</span> <b>${fs(dPdx, 2)} €/MWh per ${F.unit}</b></div>` +
+    `<div><span>Curvatura</span> <b>${fs(m.d2, 2)} €/MWh per ${F.unit}²</b></div>` +
+    `<div><span>σ adesso</span> <b>${f(sigEff, 2)} ${F.unit}</b></div>` +
+    `<div><span>Premio di convessità</span> <b>${fs(m.prem, 2)} €/MWh</b></div>`;
+}
+
+/* ---------- Render: greche ---------- */
+function renderGreeks(m){
+  const {p, F, E, delta, gamma, vega, theta, dPdPSV, dPdEUA} = m;
+  const u = F.unit, nm = F.long;
+  const dir = F.unit === '°C' ? 'più caldo' : 'in più';
+  const row = (sym, name, val, unit, read) => `<tr><td class="gsym">${sym}</td><td>${name}</td><td class="num big ${cls(val)}">${fs(val, 2)}</td><td>${unit}</td><td class="wrap">${read}</td></tr>`;
+  const rd = (v, what) => Math.abs(v) < 0.005 ? `Nessuna esposizione a ${what} in questo punto.` : `${v > 0 ? 'Guadagni' : 'Perdi'} circa ${f(Math.abs(v), 2)} €`;
+  $('#greeks').innerHTML = `<thead><tr><th>Greca</th><th>Rispetto a</th><th class="num">Valore</th><th>Unità</th><th>Lettura</th></tr></thead><tbody>` +
+    row('Δ', nm, delta, `€ per ${u}`, Math.abs(delta) < 0.005 ? 'Qui la curva è piatta: il fattore non muove il prezzo.' : `${rd(delta)} per ogni ${u} ${dir} rispetto alla previsione.`) +
+    row('Γ', nm, gamma, `€ per ${u}²`, Math.abs(gamma) < 0.005 ? 'Nessuna curvatura locale.' : gamma < 0 ? 'Gli errori grandi ti costano più di quanto dica il delta, in entrambe le direzioni.' : 'Gli errori grandi ti costano meno di quanto dica il delta.') +
+    row('ν', `incertezza ${F.sul}`, vega, `€ per ${u} di σ`, Math.abs(vega) < 0.005 ? 'L\'incertezza non cambia il valore atteso.' : vega < 0 ? 'Più incertezza, peggio per te: la tua posizione è corta di convessità.' : 'Più incertezza, meglio per te.') +
+    row('Θ', 'passare di un\'ora', theta, '€ per ora', Math.abs(theta) < 0.005 ? 'Il tempo non cambia il valore atteso.' : theta > 0 ? 'Aspettare ti fa guadagnare: l\'incertezza che ti pesa si riduce.' : 'Aspettare ti costa: l\'incertezza che ti favorisce si riduce.') +
+    row('Δ', 'PSV', E * dPdPSV, '€ per €/MWh', Math.abs(dPdPSV) < 0.01 ? 'Il gas non è marginale: il PSV non muove questo prezzo.' : `Il prezzo del NORD si muove di ${f(dPdPSV, 2)} €/MWh per euro di PSV.`) +
+    row('Δ', 'EUA', E * dPdEUA, '€ per €/t', Math.abs(dPdEUA) < 0.005 ? 'Nessuna unità a emissioni al margine.' : `Il prezzo del NORD si muove di ${f(dPdEUA, 3)} €/MWh per euro di EUA.`) +
+    `</tbody>`;
+}
+
+/* ---------- Render: P&L ---------- */
+function renderPnL(m){
+  const {p, F, E, PX, x0, P0, delta, gamma, x1} = m;
+  const el = $('#pnl');
+  const R = F.errR, R_ = [], L = [], Q = [];
+  for (let i = 0; i <= 160; i++){
+    const dxr = -R + 2 * R * i / 160, xx = clampX(p.fac, x0 + dxr), d = xx - x0;
+    R_.push([dxr, E * (PX(xx) - P0)]); L.push([dxr, delta * d]); Q.push([dxr, delta * d + 0.5 * gamma * d * d]);
+  }
+  plot(el, {xlo:-R, xhi:R, ylab:'€', xlab:`Errore ${F.sul}, ${F.unit}`, yclip:1e6, aria:'P&L reale e approssimazioni',
+    series:[{pts:Q, color:'var(--l-quad)', w:2, dash:'2 4'}, {pts:L, color:'var(--l-delta)', w:1.8, dash:'7 5'}, {pts:R_, color:'var(--signal)', w:2.6}],
+    ratio:0.42, minH:250, maxH:360,
+    over:(X, Y, g) => {
+      const e = clamp(p.err, -R, R);
+      return `<line x1="${r1(X(e))}" x2="${r1(X(e))}" y1="${g.mt}" y2="${g.mt + g.ph}" style="stroke:var(--signal)" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>` +
+        `<circle cx="${r1(X(e))}" cy="${r1(Y(m.pnlReal))}" r="4.5" style="fill:var(--signal);stroke:var(--panel)" stroke-width="2"/>`;
+    }});
+  const {dx, P1, pnlReal, pnlD, pnlDG} = m;
+  $('#scen').innerHTML =
+    `<thead><tr><th>Stima</th><th>Calcolo</th><th class="num">P&amp;L</th><th class="num">Scarto dalla realtà</th></tr></thead><tbody>` +
+    `<tr><td>Valore realizzato</td><td>${f(x0, 1)} ${p.err < 0 ? '−' : '+'} ${f(Math.abs(p.err), 1)} = ${f(x1, 1)} ${F.unit}, errore effettivo ${fs(dx, 1)}</td><td class="num">—</td><td class="num">—</td></tr>` +
+    `<tr class="hl"><td>Realtà</td><td>E × [P(x₁) − P(x)] = ${f(E, 2)} × (${f(P1, 2)} − ${f(P0, 2)})</td><td class="num ${cls(pnlReal)}">${fs(pnlReal, 1)} €</td><td class="num">—</td></tr>` +
+    `<tr><td>Solo delta</td><td>Δ × errore = ${f(delta, 2)} × ${par(dx, 1)}</td><td class="num ${cls(pnlD)}">${fs(pnlD, 1)} €</td><td class="num">${f(Math.abs(pnlD - pnlReal), 1)} €</td></tr>` +
+    `<tr><td>Delta + gamma</td><td>Δ × errore + ½ × Γ × errore² = ${f(pnlD, 1)} + ½ × ${par(gamma, 2)} × ${par(dx, 1)}²</td><td class="num ${cls(pnlDG)}">${fs(pnlDG, 1)} €</td><td class="num">${f(Math.abs(pnlDG - pnlReal), 1)} €</td></tr></tbody>`;
+}
+
+/* ---------- Render: lettura rapida ---------- */
+function renderReadout(m){
+  const {cl, p} = m;
+  $('#readout').innerHTML =
+    `<dt>Prezzo NORD</dt><dd>${f(cl.price, 1)} €/MWh</dd>` +
+    `<dt>Marginale</dt><dd>${marginalLabel(m, false)}</dd>` +
+    `<dt>Gas disponibile</dt><dd>${f(p.gas, 1)} GW</dd>` +
+    `<dt>Saldo estero</dt><dd>${exchText(cl.nx)}</dd>` +
+    `<dt>Spread NORD − vicini</dt><dd>${fs(cl.price - p.pe, 1)} €/MWh</dd>` +
+    `<dt>Delta posizione</dt><dd>${fs(m.delta, 1)} € per ${m.F.unit}</dd>`;
+}
+
+/* ---------- Render: calcoli ---------- */
+function eq(lhs, fx, sub, res){
+  return `<div class="eq"><div class="lhs">${lhs}</div><div class="rhs"><div class="fx">= ${fx}</div>${sub ? `<div>= ${sub}</div>` : ''}<div class="res">= ${res}</div></div></div>`;
+}
+function step(k, title, body, intro){
+  return `<div class="step"><div class="k">${k}</div><div><h4>${title}</h4>${intro ? `<p class="si">${intro}</p>` : ''}${body}</div></div>`;
+}
+function renderCalc(m){
+  const {p, st, cl, Z, E, F} = m;
+  let o = '';
+  const fasce = THERMAL.filter(T => T.fuel === 'gas');
+  o += step(1, 'Capacità termica disponibile',
+    eq('Gas disponibile', `installato (${(REAL && REAL.fonte_installata) || 'A71'}) − indisponibilità REMIT (A80)`, '', `<b>${f(p.gas, 2)} GW</b>`) +
+    eq('Fasce', fasce.map(T => `${TECH[T.id].name} ${pc(T.share, 0)}`).join(' + '), fasce.map(T => f(p.gas * T.share, 2)).join(' + '), `${f(p.gas, 2)} GW`) +
+    eq('Costo delle fasce', 'PSV ÷ η + (EUA × 0,2016) ÷ η + VOM', `η da ${pc(fasce[0].eb, 0)} a ${pc(fasce[fasce.length - 1].ew, 0)}`,
+       `da ${f(srmc(p.psv, fasce[0].eb, GAS_EF, p.eua, fasce[0].vom), 1)} a ${f(srmc(p.psv, fasce[fasce.length - 1].ew, GAS_EF, p.eua, fasce[fasce.length - 1].vom), 1)} €/MWh`),
+    'Il gas disponibile si divide in tre fasce; dentro ogni fascia il rendimento scende in modo lineare dal migliore al peggiore.');
+  o += step(2, 'Blocco a costo zero',
+    eq('Z', 'altre must-run + idro fluente + eolico + solare', `${f(p.mr, 1)} + ${f(p.ror, 1)} + ${f(p.wind, 2)} + ${f(p.sol, 1)}`, `<b>${f(Z, 2)} GW</b>`));
+  o += step(3, 'Equilibrio con l\'estero',
+    eq('Condizione', 'Z + offerte fino a P = domanda + Centro-Nord + saldo con l\'estero(P)', cl.zero ? `${f(Z, 2)} ≥ ${f(p.dem, 1)} + ${par(p.cn, 1)} + ${f(cl.nx, 2)} già a P = 0` : cl.scarcity ? 'nessun P la soddisfa' : `${f(Z, 2)} + ${f(cl.x, 2)} = ${f(p.dem, 1)} + ${par(p.cn, 1)} + ${par(cl.nx, 2)}`, `<b>P = ${f(cl.price, 2)} €/MWh</b>`) +
+    eq('Saldo(P)', `export pieno sotto ${f(p.pe - EXCH_SP, 0)}, import pieno sopra ${f(p.pe + EXCH_SP, 0)}, lineare in mezzo`, '', exchText(cl.nx)),
+    'Il NORD compra dai vicini finché costano meno. Per questo l\'import è un\'offerta che cresce quando il prezzo del NORD sale, e il prezzo si trova risolvendo per P.');
+  let pb = '';
+  if (cl.zero) pb = eq('P', 'eccesso di offerta', '', '<b>0 €/MWh</b>');
+  else if (cl.scarcity) pb = eq('P', 'tetto', '', `<b>${f(CAP, 0)} €/MWh</b>`);
+  else if (cl.kind === 'exch') pb = eq('P', 'prezzo dove il saldo con l\'estero chiude la differenza', '', `<b>${f(cl.price, 2)} €/MWh</b>`);
+  else {
+    const sl = cl.slice;
+    if (sl.eta){
+      const T = TH[sl.t], gas = T.fuel === 'gas', fp = gas ? st.psv : st.coalTh;
+      pb = eq('SRMC', `${gas ? 'PSV' : 'Carbone'} ÷ η + (EUA × ${T.efs}) ÷ η + VOM`, `${f(fp, 2)} ÷ ${f(sl.eta, 4)} + (${f(p.eua, 0)} × ${T.efs}) ÷ ${f(sl.eta, 4)} + ${f(T.vom, 0)}`, `${f(sl.c, 2)} €/MWh`);
+    } else pb = eq('Costo', TECH[sl.t].long, '', `${f(sl.c, 2)} €/MWh`);
+    pb += eq('Margine', 'M × (quantità dispatchable usata ÷ totale)³', `${f(st.mk, 0)} × (${f(cl.x, 2)} ÷ ${f(st.total, 2)})³`, `${f(cl.mk, 2)} €/MWh`) +
+          eq('P', 'costo + margine, interpolato tra fette vicine', '', `<b>${f(cl.price, 2)} €/MWh</b>`);
+  }
+  o += step(4, 'Costo dell\'unità marginale', pb);
+  o += step(5, 'Esposizione in energia', eq('E', 'posizione × durata', `${f(p.pos, 0)} MW × ${p.dur === 1 ? '1' : '0,25'} h`, `<b>${f(E, 2)} MWh</b>`));
+  o += step(6, 'Delta e gamma rispetto ' + F.al,
+    eq('∂P/∂x', `[P(x + ${f(m.hp, 1)}) − P(x − ${f(m.hm, 1)})] ÷ ${f(m.hp + m.hm, 1)}`, `(${f(m.Pp, 2)} − ${f(m.Pm, 2)}) ÷ ${f(m.hp + m.hm, 1)}`, `${fs(m.dPdx, 3)} €/MWh per ${F.unit}`) +
+    eq('Δ', 'E × ∂P/∂x', `${f(E, 2)} × ${par(m.dPdx, 3)}`, `<b>${fs(m.delta, 2)} € per ${F.unit}</b>`) +
+    eq('∂²P/∂x²', '2 × [pendenza a destra − pendenza a sinistra] ÷ (passo totale)', `2 × [(${f(m.Pp, 2)} − ${f(m.P0, 2)}) ÷ ${f(m.hp, 1)} − (${f(m.P0, 2)} − ${f(m.Pm, 2)}) ÷ ${f(m.hm, 1)}] ÷ ${f(m.hp + m.hm, 1)}`, `${fs(m.d2, 3)}`) +
+    eq('Γ', 'E × ∂²P/∂x²', `${f(E, 2)} × ${par(m.d2, 3)}`, `<b>${fs(m.gamma, 2)} € per ${F.unit}²</b>`),
+    'Ogni punto ricostruisce la stack con il fattore spostato e ricalcola il prezzo. Vicino ai limiti (per esempio solare a zero) il passo si accorcia da un lato.');
+  o += step(7, 'Incertezza, premio, vega e theta',
+    eq('σ', 'σ a 24 h × √(ore ÷ 24)', `${f(p.sig, 1)} × √(${f(p.hrs, 1)} ÷ 24)`, `<b>${f(m.sigEff, 3)} ${F.unit}</b>`) +
+    eq('E[P]', 'Σ wᵢ × P(x + σ × zᵢ), 121 scenari da −4σ a +4σ', '', `${f(m.ep, 3)} €/MWh`) +
+    eq('Premio', 'E[P] − P(x)', `${f(m.ep, 3)} − ${f(m.P0, 3)}`, `<b>${fs(m.prem, 3)} €/MWh</b>`) +
+    eq('Approssimazione', '½ × ∂²P/∂x² × σ²', `½ × ${par(m.d2, 3)} × ${f(m.sigEff, 3)}²`, `${fs(m.premApprox, 3)} €/MWh`) +
+    eq('Vega', '[V(σ + 0,25) − V(σ − 0,25)] ÷ 0,5, con V = E × premio', `(${f(m.Va, 3)} − ${f(m.Vb, 3)}) ÷ ${f(m.sigA - m.sigB, 2)}`, `<b>${fs(m.vega, 2)} €</b>`) +
+    eq('Theta', 'V(σ tra un\'ora) − V(σ adesso)', `${f(m.VT1, 3)} − ${par(m.V0, 3)}`, `<b>${fs(m.theta, 3)} € per ora</b>`));
+  $('#calc').innerHTML = o;
+}
+
+/* ---------- Render principale ---------- */
+/* ---------- Dati reali GME ed ENTSO-E ---------- */
+const REAL = (typeof window !== 'undefined' && window.MOQA_REALE && window.MOQA_REALE.righe && window.MOQA_REALE.righe.length) ? window.MOQA_REALE : null;
+const RC = REAL ? Object.fromEntries(REAL.colonne.map((c, i) => [c, i])) : {};
+const RKEYS = ['dem','wind','sol','ror','mr','pe','imp','exp','cn','gas','hyd','coal','psv','eua','api2','fx'];
+let realSel = null;             // indice della riga caricata
+const R_ML = 56, R_MR = 16;     // margini sinistro e destro dei due grafici del mese reale (stesso asse X)
+let RFULL = null;               // cursori che ogni riga dei dati sovrascrive (calcolato al primo backtest)
+let btCache = {key:'', model:null};
+const rv = (row, c) => (c in RC && row[RC[c]] !== null && row[RC[c]] !== undefined) ? row[RC[c]] : null;
+const rlim = id => { const c = CTRL.find(x => x.id === id); return v => clamp(v, c.min, c.max); };
+function fuelsFor(day){
+  const cb = (REAL && REAL.combustibili) || {}, g = cb.giornalieri || {};
+  let best = null;
+  for (const d of Object.keys(g).sort()) if (d <= day) best = d;
+  if (!best){ const ks = Object.keys(g).sort(); if (ks.length) best = ks[0]; }
+  return {...(cb.default || {}), ...(best ? g[best] : {})};
+}
+function rowToState(row){
+  const o = {}, day = row[0];
+  const set = (id, v) => { if (v !== null && Number.isFinite(v)) o[id] = rlim(id)(v); };
+  set('dem', rv(row, 'carico'));
+  set('wind', rv(row, 'eolico'));
+  set('sol', rv(row, 'solare'));
+  set('ror', rv(row, 'idro_fluente'));
+  set('mr', rv(row, 'altre_mr'));
+  set('pe', rv(row, 'prezzo_vicini'));
+  set('imp', rv(row, 'cap_import'));
+  set('exp', rv(row, 'cap_export'));
+  set('cn', rv(row, 'export_cnor'));
+  set('gas', rv(row, 'gas_disp'));
+  set('hyd', rv(row, 'idro_disp'));
+  set('coal', rv(row, 'carbone_disp'));
+  const fu = fuelsFor(day);
+  for (const k of ['psv','eua','api2','fx']) if (fu[k] !== undefined) set(k, +fu[k]);
+  return o;
+}
+function modelPriceFast(p){
+  return clear(p, buildStack(p), zeroOf(p), demTot(p)).price;
+}
+function backtest(){
+  // Nella chiave restano i cursori che i dati non coprono in tutte le ore (es. gas disponibile senza
+  // capacità installata): se l'utente li muove, il confronto con il mese va ricalcolato.
+  if (RFULL === null) RFULL = RKEYS.filter(k => REAL.righe.every(r => rowToState(r)[k] !== undefined));
+  const base = {...state}; for (const k of RFULL) delete base[k];
+  for (const k of ['pos','sig','hrs','err','fac','dur']) delete base[k];
+  const key = JSON.stringify(base);
+  if (btCache.key === key) return btCache.model;
+  const out = REAL.righe.map(r => {
+    const rs = rowToState(r);
+    if (rs.dem === undefined) return null;
+    return modelPriceFast({...state, ...rs});
+  });
+  btCache = {key, model:out};
+  return out;
+}
+function loadReal(i){
+  realSel = i;
+  Object.assign(state, rowToState(REAL.righe[i]));
+  activePreset = null;
+  syncControls();
+  syncRealPanel();
+  schedule();
+}
+function lastRealIdx(){
+  for (let i = REAL.righe.length - 1; i >= 0; i--) if (rv(REAL.righe[i], 'prezzo_nord') !== null && rv(REAL.righe[i], 'carico') !== null) return i;
+  return REAL.righe.length - 1;
+}
+function buildRealPanel(){
+  const box = $('#real-box');
+  if (!REAL){
+    box.innerHTML = `<div class="real-miss">Dati non ancora costruiti. Dalla cartella del progetto lancia <code>python scripts/costruisci_dati.py --mese AAAA-MM</code> e ricarica. Finché manca <code>data/moqa_dati.js</code> la pagina usa i valori illustrativi.</div>`;
+    $('#s0').hidden = true;
+    const a = document.querySelector('.jump a[href="#s0"]'); if (a) a.remove();
+    return;
+  }
+  const days = [...new Set(REAL.righe.map(r => r[0]))];
+  box.innerHTML =
+    `<div class="real-row"><select id="rd-day" aria-label="Giorno">${days.map(d => `<option>${d}</option>`).join('')}</select>` +
+    `<select id="rd-hour" aria-label="Ora">${Array.from({length:24}, (_, h) => `<option value="${h}">${String(h).padStart(2, '0')}–${String(h + 1).padStart(2, '0')}</option>`).join('')}</select></div>` +
+    `<div class="real-row"><button type="button" class="real-btn" id="rd-load">Carica quest'ora</button><button type="button" class="real-btn ghost" id="rd-last">Ultima ora</button></div>` +
+    `<dl class="real-dl" id="rd-dl"></dl>` +
+    `<div class="ctl-hint">Fonte: ${REAL.fonte}, aggiornato ${REAL.generato}. Gas disponibile: ${REAL.fonte_gas}. ${REAL.fonte_combustibili}; API2 e FX: valori predefiniti.</div>`;
+  const pick = () => {
+    const d = $('#rd-day').value, h = +$('#rd-hour').value;
+    const i = REAL.righe.findIndex(r => r[0] === d && r[1] === h);
+    if (i >= 0) loadReal(i);
+  };
+  $('#rd-load').addEventListener('click', pick);
+  $('#rd-last').addEventListener('click', () => loadReal(lastRealIdx()));
+  for (const id of ['#rchart', '#rchart2']) $(id).addEventListener('click', e => {
+    const svg = $(id + ' svg'); if (!svg) return;
+    const bb = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+    const x = (e.clientX - bb.left) / bb.width * vb.width;
+    const pw = vb.width - R_ML - R_MR;
+    const i = Math.round((x - R_ML) / pw * (REAL.righe.length - 1));
+    if (i >= 0 && i < REAL.righe.length) loadReal(i);
+  });
+}
+function syncRealPanel(){
+  if (!REAL || realSel === null) return;
+  const r = REAL.righe[realSel];
+  $('#rd-day').value = r[0]; $('#rd-hour').value = String(r[1]);
+  const g = (c, d = 1, u = '') => { const v = rv(r, c); return v === null ? '—' : f(v, d) + u; };
+  const imp = rv(r, 'import_netto');
+  $('#rd-dl').innerHTML =
+    `<dt>Prezzo MGP NORD reale</dt><dd>${g('prezzo_nord', 1, ' €/MWh')}</dd>` +
+    `<dt>Prezzo vicini (FR, CH)</dt><dd>${g('prezzo_vicini', 1, ' €/MWh')}</dd>` +
+    `<dt>Carico NORD</dt><dd>${g('carico', 1, ' GW')}</dd>` +
+    `<dt>Solare</dt><dd>${g('solare', 1, ' GW')}</dd>` +
+    `<dt>Saldo estero reale</dt><dd>${imp === null ? '—' : exchText(-imp)}</dd>` +
+    `<dt>Capacità di import</dt><dd>${g('cap_import', 1, ' GW')}</dd>` +
+    `<dt>Gas disponibile</dt><dd>${g('gas_disp', 1, ' GW')}</dd>` +
+    `<dt>Export verso Centro-Nord</dt><dd>${g('export_cnor', 1, ' GW')}</dd>`;
+}
+function renderReal(m){
+  if (!REAL) return;
+  const rows = REAL.righe, n = rows.length, mod = backtest();
+  const real = rows.map(r => rv(r, 'prezzo_nord'));
+  let se = 0, sa = 0, k = 0;
+  for (let i = 0; i < n; i++) if (real[i] !== null && mod[i] !== null){ const e = mod[i] - real[i]; se += e; sa += Math.abs(e); k++; }
+  const cur = realSel !== null ? real[realSel] : null;
+  $('#rkpis').innerHTML =
+    `<div class="kpi"><span>Errore medio assoluto (MAE)</span><b>${k ? f(sa / k, 1) : '—'} <small>€/MWh</small></b></div>` +
+    `<div class="kpi"><span>Errore medio (modello − reale)</span><b>${k ? fs(se / k, 1) : '—'} <small>€/MWh</small></b></div>` +
+    `<div class="kpi"><span>Ora caricata: NORD reale</span><b>${cur === null ? '—' : f(cur, 1)} <small>€/MWh</small></b></div>` +
+    `<div class="kpi"><span>Ora caricata: modello − reale</span><b class="${cur === null ? '' : cls(m.cl.price - cur, 0.5)}">${cur === null ? '—' : fs(m.cl.price - cur, 1)} <small>€/MWh</small></b></div>`;
+  const pr = [], pm = [], nuc = [];
+  let pmax = 10, pmin = 0;
+  for (let i = 0; i < n; i++){
+    if (real[i] !== null){ pr.push([i, real[i]]); pmax = Math.max(pmax, real[i]); pmin = Math.min(pmin, real[i]); }
+    if (mod[i] !== null){ pm.push([i, Math.min(mod[i], 600)]); pmax = Math.max(pmax, Math.min(mod[i], 600)); }
+  }
+  pmax = Math.min(pmax, 600);
+  const rp = [];
+  rows.forEach((r, i) => { const v = rv(r, 'residuo'); if (v !== null) rp.push([i, v]); });
+  // Due grafici impilati con lo stesso asse orizzontale: prezzi sopra, carico residuo sotto
+  const el = $('#rchart'), el2 = $('#rchart2');
+  const {W, Hh} = sizeOf(el, 0.36, 260, 360);
+  const H2 = sizeOf(el2, 0.16, 130, 180).Hh;
+  const ml = R_ML, mr = R_MR, mt = 22, mb = 34, pw = W - ml - mr;
+  const X = i => ml + i / Math.max(1, n - 1) * pw;
+  const seg = (arr, Yf) => arr.map(([x, y]) => r1(X(x)) + ',' + r1(Yf(y))).join(' ');
+  const frame = (H, yr, Y, unit, label) => {
+    const ph = H - mt - mb;
+    let o = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">`;
+    for (const t of ticks(yr.lo, yr.hi, yr.step)) o += `<line class="gl" x1="${ml}" x2="${W - mr}" y1="${r1(Y(t))}" y2="${r1(Y(t))}"/><text class="tk" x="${ml - 8}" y="${r1(Y(t) + 4)}" text-anchor="end">${f(t, tdec(yr.step))}</text>`;
+    let lastDay = '';
+    const every = pw / Math.max(1, n) * 72 < 40 ? 7 : 3;      // etichette ogni 3 giorni, ogni 7 sugli schermi stretti
+    rows.forEach((r, i) => { if (r[0] !== lastDay){ lastDay = r[0]; const dd = r[0].slice(8, 10) + '/' + r[0].slice(5, 7);
+      if (i === 0 || (+r[0].slice(8, 10)) % every === 0) o += `<line class="gl" x1="${r1(X(i))}" x2="${r1(X(i))}" y1="${mt}" y2="${mt + ph}" opacity=".5"/><text class="tk" x="${r1(X(i))}" y="${mt + ph + 16}" text-anchor="middle">${dd}</text>`; } });
+    o += `<text class="axl" x="8" y="${mt - 8}">${unit}</text>`;
+    return o;
+  };
+  const cursor = H => realSel === null ? '' : `<line x1="${r1(X(realSel))}" x2="${r1(X(realSel))}" y1="${mt}" y2="${H - mb}" style="stroke:var(--ink)" stroke-width="1.2" stroke-dasharray="3 3"/>`;
+
+  const yr = niceRange(pmin, pmax * 1.05, 6), ph = Hh - mt - mb;
+  const Y = v => mt + ph - (clamp(v, yr.lo, yr.hi) - yr.lo) / (yr.hi - yr.lo) * ph;
+  let s = frame(Hh, yr, Y, '€/MWh', 'Prezzo MGP del NORD reale e del modello');
+  s += `<polyline points="${seg(pm, Y)}" fill="none" style="stroke:var(--l-delta)" stroke-width="1.6"/>`;
+  s += `<polyline points="${seg(pr, Y)}" fill="none" style="stroke:var(--signal)" stroke-width="1.8"/>`;
+  el.innerHTML = s + cursor(Hh) + `</svg>`;
+
+  const rv2 = rp.map(([, v]) => v), ph2 = H2 - mt - mb;
+  const yr2 = rv2.length ? niceRange(Math.min(0, ...rv2), Math.max(...rv2), 3) : {lo:0, hi:30, step:10};
+  const Y2 = v => mt + ph2 - (clamp(v, yr2.lo, yr2.hi) - yr2.lo) / (yr2.hi - yr2.lo) * ph2;
+  let s2 = frame(H2, yr2, Y2, 'GW carico residuo', 'Carico residuo del NORD');
+  s2 += `<polyline points="${seg(rp, Y2)}" fill="none" style="stroke:var(--t-nucI)" stroke-width="1.5"/>`;
+  el2.innerHTML = s2 + cursor(H2) + `</svg>`;
+  $('#rnote').innerHTML = `<b>Come leggerlo.</b> Dove le due linee stanno vicine il modello ha capito chi fa il prezzo. Dove il blu sta sistematicamente sopra o sotto il magenta, c'è un parametro non misurato da tarare: water value dell'idro, rendimenti del parco a gas, margine di scarsità. Il modello non va sotto zero. Le variabili non scaricate (water value, termosensibilità, margine di scarsità) restano quelle del pannello e valgono per tutte le ore.`;
+}
+
+/* ---------- Render: indisponibilità REMIT ---------- */
+const RM_GRUPPI = [
+  ['gas', 'Gas', '--t-ccgtA'], ['idro', 'Idro a bacino e pompaggi', '--t-hydro'],
+  ['carbone', 'Carbone', '--t-coal'], ['altro', 'Altre fonti', '--t-mr']];
+const RM_COL = Object.fromEntries(RM_GRUPPI.map(([k, , c]) => [k, c]));
+let rmMode = 'ora', rmGeom = null, rmShow = 10;   // rmShow: righe della tabella (10 o Infinity)
+const rmVal = (r, g) => { const v = rv(r, 'indisp_' + g); return v === null ? 0 : v; };
+const rmTot = r => RM_GRUPPI.reduce((s, [g]) => s + rmVal(r, g), 0);
+const rmHas = () => REAL && Array.isArray(REAL.eventi) && RM_GRUPPI.some(([g]) => ('indisp_' + g) in RC);
+function rmData(s){            // '2026-10-03 07:00' -> '03/10 07:00' (anno se diverso dal mese)
+  if (!s) return '—';
+  const y = s.slice(0, 4), d = s.slice(8, 10) + '/' + s.slice(5, 7) + (REAL && y !== REAL.mese.slice(0, 4) ? '/' + y.slice(2) : '');
+  return d + ' ' + s.slice(11, 16);
+}
+function rmOraLabel(i){
+  const r = REAL.righe[i];
+  return `${r[0].slice(8, 10)}/${r[0].slice(5, 7)} ${String(r[1]).padStart(2, '0')}–${String(r[1] + 1).padStart(2, '0')}`;
+}
+function rmMwOra(e, t){         // MW fermi dell'evento nell'ora che inizia a t (epoch s)
+  let mw = 0;
+  for (const [a, b, v] of e.periodi) if (a < t + 3600 && b > t) mw = Math.max(mw, v);
+  return mw;
+}
+function renderRemit(m){
+  if (!REAL){ $('#s8').hidden = true; const a = document.querySelector('.jump a[href="#s8"]'); if (a) a.remove(); return; }
+  if (!rmHas()){
+    $('#rmbody').hidden = true;
+    $('#rmmiss').innerHTML = `<p class="note">Nei dati di questo mese manca il file <code>A80_IT_NORD.csv</code>: senza messaggi REMIT il gas disponibile resta quello del pannello.</p>`;
+    return;
+  }
+  const rows = REAL.righe, n = rows.length, ev = REAL.eventi;
+  const sel = realSel !== null ? rows[realSel] : null;
+  const t = (sel && REAL.ore_utc) ? REAL.ore_utc[realSel] : null;
+
+  // KPI: ora caricata, oppure media del mese
+  const media = g => rows.reduce((s, r) => s + rmVal(r, g), 0) / Math.max(1, n);
+  const v = g => sel ? rmVal(sel, g) : media(g);
+  const attivi = t === null ? [] : ev.filter(e => rmMwOra(e, t) > 0);
+  const quando = sel ? 'nell\'ora caricata' : 'media del mese';
+  $('#rmkpi').innerHTML =
+    `<div class="kpi"><span>Fermo in totale, ${quando}</span><b>${f(RM_GRUPPI.reduce((s, [g]) => s + v(g), 0), 2)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Gas (tolto)</span><b>${f(v('gas'), 2)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Idro e carbone (tolti)</span><b>${f(v('idro') + v('carbone'), 2)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Altre fonti (non tolte)</span><b>${f(v('altro'), 2)} <small>GW</small></b></div>` +
+    `<div class="kpi"><span>Messaggi attivi</span><b>${t === null ? '—' : attivi.length} <small>su ${ev.length} nel mese</small></b></div>`;
+
+  // grafico ad aree impilate
+  const el = $('#rmchart');
+  const {W, Hh} = sizeOf(el, 0.32, 240, 330);
+  const ml = 56, mr = 20, mt = 22, mb = 34, pw = W - ml - mr, ph = Hh - mt - mb;
+  const tot = rows.map(rmTot);
+  let imax = 0; tot.forEach((x, i) => { if (x > tot[imax]) imax = i; });
+  const yr = niceRange(0, Math.max(0.5, tot[imax] * 1.08), 5);
+  const X = i => ml + i / Math.max(1, n - 1) * pw;
+  const Y = y => mt + ph - clamp(y / yr.hi, 0, 1) * ph;
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Capacità indisponibile nel NORD per fonte, ora per ora">`;
+  for (const k of ticks(yr.lo, yr.hi, yr.step)) s += `<line class="gl" x1="${ml}" x2="${W - mr}" y1="${r1(Y(k))}" y2="${r1(Y(k))}"/><text class="tk" x="${ml - 8}" y="${r1(Y(k) + 4)}" text-anchor="end">${f(k, tdec(yr.step))}</text>`;
+  let lastDay = ''; const passo = pw < 520 ? 7 : 3;
+  rows.forEach((r, i) => { if (r[0] !== lastDay){ lastDay = r[0]; const dd = r[0].slice(8, 10) + '/' + r[0].slice(5, 7);
+    if (i === 0 || (+r[0].slice(8, 10)) % passo === 0) s += `<line class="gl" x1="${r1(X(i))}" x2="${r1(X(i))}" y1="${mt}" y2="${mt + ph}" opacity=".5"/><text class="tk" x="${r1(X(i))}" y="${mt + ph + 16}" text-anchor="middle">${dd}</text>`; } });
+  s += `<text class="axl" x="8" y="${mt - 8}">GW indisponibili</text>`;
+  const base = new Array(n).fill(0);
+  for (const [g, , col] of RM_GRUPPI){
+    const top = rows.map((r, i) => base[i] + rmVal(r, g));
+    if (top.some((y, i) => y > base[i] + 1e-9)){
+      const up = top.map((y, i) => r1(X(i)) + ',' + r1(Y(y))).join(' ');
+      const dn = base.map((y, i) => r1(X(i)) + ',' + r1(Y(y))).reverse().join(' ');
+      s += `<polygon points="${up} ${dn}" style="fill:var(${col});stroke:var(--panel)" stroke-width="1" stroke-linejoin="round"/>`;
+    }
+    for (let i = 0; i < n; i++) base[i] = top[i];
+  }
+  s += `<line x1="${ml}" x2="${W - mr}" y1="${r1(Y(0))}" y2="${r1(Y(0))}" style="stroke:var(--line)"/>`;
+  if (realSel !== null) s += `<line x1="${r1(X(realSel))}" x2="${r1(X(realSel))}" y1="${mt}" y2="${mt + ph}" style="stroke:var(--ink)" stroke-width="1.2" stroke-dasharray="3 3"/>`;
+  s += `</svg>`;
+  el.innerHTML = s;
+  rmGeom = {W, Hh, ml, mt, pw, ph, n};
+
+  // effetto sul prezzo del modello
+  const {p, cl} = m;
+  const cAt = pp => clear(pp, buildStack(pp), zeroOf(pp), demTot(pp)).price;
+  let rd = `<div><span>Picco del mese</span> <b>${f(tot[imax], 2)} GW, ${rmOraLabel(imax)}</b></div>`;
+  if (sel){
+    const gOff = rmVal(sel, 'gas'), aOff = rmVal(sel, 'altro');
+    if (gOff > 0.005){
+      const P1 = cAt({...p, gas:p.gas + gOff});
+      rd += `<div><span>Con il gas fermo di nuovo in servizio (+${f(gOff, 2)} GW) il modello darebbe</span> <b>${f(P1, 1)} €/MWh (${fs(P1 - cl.price, 1)})</b></div>`;
+    }
+    if (aOff > 0.005){
+      const P2 = cAt({...p, gas:Math.max(0, p.gas - aOff)});
+      rd += `<div><span>Se le altre fonti fermate fossero tutte a gas (−${f(aOff, 2)} GW) il modello darebbe</span> <b>${f(P2, 1)} €/MWh (${fs(P2 - cl.price, 1)})</b></div>`;
+    }
+  } else rd += `<div><span>Carica un'ora reale per vedere l'effetto delle fermate sul prezzo del modello.</span></div>`;
+  $('#rm-read').innerHTML = rd;
+
+  // tabella delle fermate
+  const modo = (t === null) ? 'mese' : rmMode;
+  document.querySelectorAll('#rmseg button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.rm === modo));
+    b.disabled = b.dataset.rm === 'ora' && t === null;
+  });
+  const lista = modo === 'ora'
+    ? attivi.map(e => ({e, mw:rmMwOra(e, t)})).sort((a, b) => b.mw - a.mw)
+    : ev.map(e => ({e, mw:e.mw_max}));
+  $('#rmtab-h').textContent = modo === 'ora' ? `Le fermate attive ${rmOraLabel(realSel)}` : 'Tutte le fermate del mese';
+  $('#rmtab-p').textContent = modo === 'ora'
+    ? 'MW fermi in quest\'ora, dalla versione più recente di ogni messaggio. Una stessa unità può comparire in più messaggi: nel totale conta il valore più alto.'
+    : 'MW fermi: il valore più alto del messaggio dentro il mese. Ordinate dalla più grande.';
+  const MAXR = rmShow;
+  const righe = lista.slice(0, MAXR).map(({e, mw}) =>
+    `<tr><td translate="no">${esc(e.unita)}</td>` +
+    `<td><i class="sw" style="background:var(${RM_COL[e.gruppo] || '--t-mr'})"></i>${esc(e.fonte || '—')}` +
+    (e.psr_a80 !== undefined && e.psr_a80 !== e.psr ? `<br><small>in A80: ${esc(e.fonte_a80 || 'non dichiarata')}</small>` : '') + `</td>` +
+    `<td>${esc(e.tipo || '—')}</td><td class="num">${f(mw, 0)}</td><td class="num">${e.installata === null ? '—' : f(e.installata, 0)}</td>` +
+    `<td class="num">${rmData(e.inizio)}</td><td class="num">${rmData(e.fine)}</td><td class="num">${rmData(e.pubblicato)}</td>` +
+    `<td class="wrap" translate="no">${esc(e.causa || '—')}</td></tr>`).join('');
+  $('#rmtab').innerHTML = lista.length
+    ? `<thead><tr><th>Unità</th><th>Fonte</th><th>Tipo</th><th class="num">MW fermi</th><th class="num">MW installati</th><th class="num">Da</th><th class="num">A</th><th class="num">Aggiornato</th><th>Causa</th></tr></thead><tbody>${righe}</tbody>`
+    : `<tbody><tr><td class="wrap">${modo === 'ora' ? 'Nessuna fermata dichiarata in quest\'ora.' : 'Nessuna fermata dichiarata nel mese.'}</td></tr></tbody>`;
+  $('#rm-more').textContent = lista.length > MAXR ? `E altre ${lista.length - MAXR} più piccole.` : '';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;'}[c])); }
+function bindRemit(){
+  if (!REAL) return;
+  $('#rmseg').addEventListener('click', e => {
+    const b = e.target.closest('button[data-rm]'); if (!b || b.disabled) return;
+    rmMode = b.dataset.rm; renderRemit(lastM);
+  });
+  $('#rmshow').addEventListener('change', e => { rmShow = e.target.value === 'all' ? Infinity : 10; renderRemit(lastM); });
+  const wrap = $('#rmwrap'), tip = $('#rmtip');
+  const idx = e => {
+    const svg = wrap.querySelector('svg'); if (!svg || !rmGeom) return -1;
+    const bb = svg.getBoundingClientRect();
+    const x = (e.clientX - bb.left) / bb.width * rmGeom.W;
+    const i = Math.round((x - rmGeom.ml) / rmGeom.pw * (rmGeom.n - 1));
+    return (i >= 0 && i < rmGeom.n) ? i : -1;
+  };
+  wrap.addEventListener('pointermove', e => {
+    const i = idx(e); if (i < 0){ tip.classList.remove('on'); return; }
+    const r = REAL.righe[i];
+    tip.innerHTML = `<b>${rmOraLabel(i)}</b>` + RM_GRUPPI.map(([g, nome]) => `<br>${nome}: ${f(rmVal(r, g), 2)} GW`).join('') + `<br><b>Totale ${f(rmTot(r), 2)} GW</b>`;
+    const wr = wrap.getBoundingClientRect();
+    tip.style.left = clamp(e.clientX - wr.left, 110, wr.width - 110) + 'px';
+    tip.style.top = (e.clientY - wr.top) + 'px';
+    tip.classList.add('on');
+  });
+  wrap.addEventListener('pointerleave', () => tip.classList.remove('on'));
+  wrap.addEventListener('click', e => { const i = idx(e); if (i >= 0) loadReal(i); });
+}
+
+function render(){
+  const m = computeAll(state);
+  lastM = m;
+  renderKPIs(m);
+  renderStack(m);
+  $('#stack-eq').innerHTML = stackFormula(m);
+  renderTech(m);
+  renderImp(m);
+  renderPS(m);
+  renderGreeks(m);
+  renderPnL(m);
+  renderReadout(m);
+  renderCalc(m);
+  renderReal(m);
+  renderRemit(m);
+}
+
+if (typeof document === 'undefined'){ globalThis.__model = {computeAll, DEFAULTS, PRESETS, buildStack, clear}; return; }
+
+function init(){
+  buildControls();
+  buildRealPanel();
+  // Al primo avvio la pagina mostra lo scenario "Base: ottobre feriale, ore 19" (state = DEFAULTS, activePreset = 'base').
+  // Le ore reali si caricano dal pannello, dal pulsante "Ultima ora" o con un clic sui grafici.
+  syncControls();
+  syncRealPanel();
+  document.addEventListener('input', e => {
+    const el = e.target;
+    if (!(el instanceof HTMLInputElement) || el.type !== 'range') return;
+    const id = el.id.slice(3);
+    state[id] = parseFloat(el.value);
+    setPct(el);
+    const c = CTRL.find(x => x.id === id);
+    if (c) $('#out-' + id).textContent = outText(c);
+    else if (id === 'err') $('#out-err').textContent = errText();
+    if (id !== 'err' && id !== 'pos' && id !== 'sig' && id !== 'hrs'){ activePreset = null; document.querySelectorAll('#presets button').forEach(b => b.setAttribute('aria-pressed', 'false')); }
+    schedule();
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.preset){
+      const pr = PRESETS.find(x => x.id === b.dataset.preset);
+      Object.assign(state, DEFAULTS, pr.v);
+      activePreset = pr.id;
+      realSel = null;
+    } else if (b.dataset.dur){ state.dur = parseFloat(b.dataset.dur); }
+    else if (b.dataset.der){ state.der = parseInt(b.dataset.der, 10); activePreset = null; }
+    else if (b.dataset.fac){
+      if (state.fac === b.dataset.fac) return;
+      state.fac = b.dataset.fac; state.sig = FACT[state.fac].sig; state.err = clamp(state.err, -FACT[state.fac].errR, FACT[state.fac].errR);
+    } else return;
+    syncControls();
+    schedule();
+  });
+  bindTooltip();
+  bindRemit();
+  let rt = 0;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 120); });
+  window.MOQA_render = render;    // usato dal cambio lingua (script in fondo alla pagina)
+  render();
+}
+init();
+})();
+
+</script>
+<script>
+(() => {
+  const links = [...document.querySelectorAll('.jump a')];
+  const secs = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const set = id => links.forEach(a => {
+    const on = a.getAttribute('href') === '#' + id;
+    a.setAttribute('aria-current', String(on));
+    if (on){
+      const nav = a.parentElement, l = a.offsetLeft - nav.offsetLeft, r = l + a.offsetWidth;
+      if (l < nav.scrollLeft + 16) nav.scrollLeft = l - 24;
+      else if (r > nav.scrollLeft + nav.clientWidth - 16) nav.scrollLeft = r - nav.clientWidth + 24;
+    }
+  });
+  const upd = () => {
+    let cur = secs[0];
+    for (const s of secs) if (s.getBoundingClientRect().top < 120) cur = s;
+    if (cur) set(cur.id);
+  };
+  window.addEventListener('scroll', upd, {passive:true});
+  const bar = document.querySelector('.jumpbar');
+  links.forEach(a => a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (!t) return;
+    e.preventDefault();
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const y = t.getBoundingClientRect().top + window.scrollY - bar.offsetHeight - 12;
+    window.scrollTo({top:y, behavior: smooth ? 'smooth' : 'auto'});
+    history.replaceState(null, '', a.getAttribute('href'));
+  }));
+  upd();
+})();
+</script>
+<script>
+/* ---------- Lingua (IT / EN) e tema (chiaro / scuro) ----------
+   La pagina è scritta in italiano. In inglese ogni testo visibile viene tradotto con il dizionario
+   window.MOQA_EN (i18n/en.js): la chiave è il testo italiano con i numeri sostituiti da {0}, {1}…,
+   così una sola voce copre tutte le ore e tutti i valori. I numeri passano al formato inglese
+   (1.234,5 -> 1,234.5). I testi senza voce restano in italiano (es. le cause scritte dai gestori). */
+(() => {
+  'use strict';
+  const DICT = window.MOQA_EN || {};
+  const NUM = /(?<![\p{L}\p{N}_])[−-]?\d+(?:[.,]\d+)*/gu;
+  const ATTRS = ['aria-label', 'title', 'placeholder'];
+  const rec = new WeakMap();                  // nodo di testo -> {it, cur}
+  const missing = new Set();
+  let lang = 'it';
+  const store = {get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+                 set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }};
+
+  const swap = n => n.replace(/[.,]/g, c => c === ',' ? '.' : ',');
+  function tr(s){
+    if (!/\S/.test(s)) return null;
+    if (!/\p{L}/u.test(s)) return /[.,]/.test(s) ? s.replace(NUM, swap) : null;
+    const nums = [];
+    const k = s.replace(/\s+/g, ' ').trim().replace(NUM, m => { nums.push(m); return '{' + (nums.length - 1) + '}'; });
+    const t = DICT[k];
+    if (t === undefined){ missing.add(k); return null; }
+    const lead = s.match(/^\s*/)[0], trail = s.match(/\s*$/)[0];
+    return lead + t.replace(/\{(\d+)\}/g, (_, i) => swap(nums[+i] ?? '')) + trail;
+  }
+  function doText(n){
+    const p = n.parentNode;
+    if (!p || p.nodeName === 'SCRIPT' || p.nodeName === 'STYLE' || (p.closest && p.closest('[translate="no"]'))) return;
+    const cur = n.nodeValue, r = rec.get(n);
+    const it = (r && cur === r.cur) ? r.it : cur;
+    const want = lang === 'en' ? (tr(it) ?? it) : it;
+    rec.set(n, {it, cur:want});
+    if (cur !== want) n.nodeValue = want;
+  }
+  function doAttrs(el){
+    for (const a of ATTRS){
+      if (!el.hasAttribute(a) || el.closest('.top-tools')) continue;
+      const k = 'data-it-' + a, v = el.getAttribute(a);
+      let it = el.getAttribute(k);
+      if (it === null || v !== el.getAttribute('data-en-' + a)) { it = v; el.setAttribute(k, it); }
+      const want = lang === 'en' ? (tr(it) ?? it) : it;
+      el.setAttribute('data-en-' + a, want);
+      if (v !== want) el.setAttribute(a, want);
+    }
+  }
+  function apply(root){
+    if (root.nodeType === 3){ doText(root); return; }
+    if (root.nodeType !== 1) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n; (n = w.nextNode());) doText(n);
+    doAttrs(root);
+    root.querySelectorAll('[' + ATTRS.join('],[') + ']').forEach(doAttrs);
+  }
+  const mo = new MutationObserver(ms => {
+    if (lang !== 'en') return;
+    mo.disconnect();
+    for (const m of ms){
+      if (m.type === 'characterData') doText(m.target);
+      else if (m.type === 'attributes') doAttrs(m.target);
+      else m.addedNodes.forEach(apply);
+    }
+    watch();
+  });
+  const watch = () => mo.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:ATTRS});
+
+  const TITLE_IT = document.title;
+  function setLang(l){
+    lang = l === 'en' ? 'en' : 'it';
+    document.documentElement.lang = lang;
+    mo.disconnect();
+    if (window.MOQA_render) window.MOQA_render();
+    apply(document.body);
+    document.title = lang === 'en' ? (tr(TITLE_IT) ?? TITLE_IT) : TITLE_IT;
+    watch();
+    const b = document.getElementById('btn-lang');
+    b.querySelectorAll('[data-l]').forEach(s => s.classList.toggle('on', s.dataset.l === lang));
+    b.setAttribute('aria-label', lang === 'en' ? 'Language: English. Switch to Italian' : "Lingua: italiano. Passa all'inglese");
+    paintTheme();
+    store.set('moqa-lang', lang);
+  }
+
+  const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  const sysDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = () => { const t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : sysDark(); };
+  function paintTheme(){
+    const d = isDark(), b = document.getElementById('btn-theme');
+    const lab = lang === 'en' ? (d ? 'Light' : 'Dark') : (d ? 'Chiaro' : 'Scuro');
+    b.innerHTML = (d ? SUN : MOON) + '<span>' + lab + '</span>';
+    b.setAttribute('aria-label', lang === 'en' ? (d ? 'Switch to light theme' : 'Switch to dark theme') : (d ? 'Passa al tema chiaro' : 'Passa al tema scuro'));
+  }
+  function setTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    store.set('moqa-theme', t);
+    paintTheme();
+  }
+
+  const q = new URLSearchParams(location.search);
+  const t0 = q.get('theme') || store.get('moqa-theme');
+  if (t0 === 'dark' || t0 === 'light') document.documentElement.setAttribute('data-theme', t0);
+  document.getElementById('btn-theme').addEventListener('click', () => setTheme(isDark() ? 'light' : 'dark'));
+  document.getElementById('btn-lang').addEventListener('click', () => setLang(lang === 'en' ? 'it' : 'en'));
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', paintTheme);
+  window.MOQA_i18n = {setLang, missing, tr};
+  setLang(q.get('lang') || store.get('moqa-lang') || 'it');
+})();
+</script>
+</body>
+</html>
