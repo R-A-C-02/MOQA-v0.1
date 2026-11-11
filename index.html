@@ -52,7 +52,7 @@
   --l-delta:#6197d8; --l-quad:#8c9cb0;
 }
 *,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 62px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 112px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 h1,h2,h3,h4{font-family:var(--f-head);color:var(--ink)}
 button{font-family:inherit}
@@ -77,7 +77,7 @@ a{color:var(--l-delta)}
 .jump a[aria-current="true"]{color:var(--signal);border-bottom:2px solid var(--signal)}
 
 .layout{max-width:1440px;margin:0 auto;padding:18px 24px 56px;display:grid;grid-template-columns:318px minmax(0,1fr);gap:24px;align-items:start}
-.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);max-height:calc(100vh - 76px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px 16px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 112px);max-height:calc(100vh - 126px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px 16px}
 @media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr)}.side{position:static;max-height:none}}
 
 .grp{padding:12px 0 6px;border-top:1px solid var(--line)}
@@ -99,6 +99,25 @@ input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:v
 input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--ink)}
 .grp-main input[type=range]::-webkit-slider-thumb{background:var(--ink)}
 .grp-main input[type=range]::-moz-range-thumb{background:var(--ink)}
+/* selettore storico nella barra in alto */
+.timebar{max-width:1440px;margin:0 auto;padding:4px 24px 10px;display:flex;align-items:center;gap:14px}
+.timebar[hidden]{display:none}
+.tb-play{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.tb-play:hover{border-color:var(--ink)}
+.tb-play svg{width:14px;height:14px}
+.tb-lab{flex:none;width:236px;line-height:1.2;font-size:13px;color:var(--muted)}
+.tb-lab b{display:block;color:var(--ink);font-size:14.5px;font-weight:700}
+.tb-lab.idle b{color:var(--muted)}
+.tb-track{position:relative;flex:1;min-width:0;height:36px}
+.tb-track svg{position:absolute;left:0;right:0;top:0;width:100%;height:24px;pointer-events:none}
+.tb-track input[type=range]{position:absolute;left:0;right:0;top:9px;margin:0;width:100%}
+.tb-track input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--signal) 0 var(--pct,0%),var(--line) var(--pct,0%) 100%)}
+.tb-track input[type=range]::-moz-range-progress{background:var(--signal)}
+.tb-track input[type=range]::-webkit-slider-thumb{border-color:var(--signal);background:var(--signal)}
+.tb-track input[type=range]::-moz-range-thumb{border-color:var(--signal);background:var(--signal)}
+.tb-track.idle input[type=range]::-webkit-slider-thumb{background:var(--panel)}
+.tb-ends{position:absolute;left:0;right:0;top:27px;display:flex;justify-content:space-between;font-size:10.5px;color:var(--faint);pointer-events:none}
+@media (max-width:640px){.timebar{padding:2px 16px 8px;gap:10px}.tb-lab{width:128px;font-size:12px}.tb-lab b{font-size:13px}}
 input[type=range]:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
 
 .presets{display:flex;flex-wrap:wrap;gap:6px}
@@ -263,6 +282,15 @@ dl.gls dd{margin:0;color:var(--muted)}
 <nav class="jump" aria-label="Sezioni">
     <a href="#s1">Stack</a><a href="#s2">Parco e costi</a><a href="#s3">Frontiere</a><a href="#s4">Prezzo e rischio</a><a href="#s5">Greche</a><a href="#s6">P&amp;L</a><a href="#s7">Calcoli</a><a href="#s8">REMIT</a><a href="#s0">Mese reale</a>
   </nav>
+  <div class="timebar" id="timebar" hidden>
+    <button type="button" class="tb-play" id="tb-play" aria-label="Riproduci le ore una dopo l'altra" title="Riproduci / pausa"></button>
+    <div class="tb-lab" id="tb-lab" aria-live="polite"></div>
+    <div class="tb-track" id="tb-track">
+      <svg id="tb-spark" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <input type="range" id="tb-range" min="0" max="0" step="1" value="0" aria-label="Selettore storico: ora caricata">
+      <div class="tb-ends"><span id="tb-a"></span><span id="tb-b"></span></div>
+    </div>
+  </div>
 </div>
 
 <div class="layout">
@@ -1589,6 +1617,63 @@ function bindRemit(){
   wrap.addEventListener('click', e => { const i = idx(e); if (i >= 0) loadReal(i); });
 }
 
+/* ---------- Selettore storico (barra in alto) ----------
+   Un cursore su tutte le ore dei dati reali: spostandolo si carica quell'ora in tutta la pagina,
+   come "Carica quest'ora" ma senza clic. Dietro il cursore, il prezzo MGP del mese. */
+const GIORNI = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>';
+const PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/></svg>';
+let tbTimer = 0;
+function tbLabel(i){
+  const r = REAL.righe[i], d = r[0];
+  const g = GIORNI[new Date(d + 'T12:00:00').getDay()];
+  return `${g} ${d.slice(8, 10)}/${d.slice(5, 7)}`;
+}
+function tbStop(){ if (tbTimer){ clearInterval(tbTimer); tbTimer = 0; } $('#tb-play').innerHTML = PLAY; }
+function buildTimeBar(){
+  if (!REAL) return;
+  const n = REAL.righe.length, inp = $('#tb-range');
+  $('#timebar').hidden = false;
+  inp.max = String(n - 1);
+  const first = REAL.righe[0][0], last = REAL.righe[n - 1][0];
+  $('#tb-a').textContent = first.slice(8, 10) + '/' + first.slice(5, 7);
+  $('#tb-b').textContent = last.slice(8, 10) + '/' + last.slice(5, 7);
+  const pr = REAL.righe.map(r => rv(r, 'prezzo_nord')), ok = pr.filter(v => v !== null);
+  const lo = Math.min(...ok), hi = Math.max(...ok);
+  const pts = pr.map((v, i) => v === null ? null : `${(i / (n - 1) * 1000).toFixed(1)},${(22 - (v - lo) / Math.max(1, hi - lo) * 20).toFixed(1)}`).filter(Boolean).join(' ');
+  let days = '';
+  REAL.righe.forEach((r, i) => { if (r[1] === 0 && i > 0) days += `<line x1="${(i / (n - 1) * 1000).toFixed(1)}" x2="${(i / (n - 1) * 1000).toFixed(1)}" y1="18" y2="24" style="stroke:var(--line)" stroke-width="1"/>`; });
+  const sp = $('#tb-spark');
+  sp.setAttribute('viewBox', '0 0 1000 24');
+  sp.innerHTML = days + `<polyline points="${pts}" fill="none" style="stroke:var(--faint)" stroke-width="1.2" vector-effect="non-scaling-stroke" opacity=".7"/>`;
+  inp.addEventListener('input', () => { tbStop(); loadReal(+inp.value); });
+  $('#tb-play').innerHTML = PLAY;
+  $('#tb-play').addEventListener('click', () => {
+    if (tbTimer){ tbStop(); return; }
+    let i = realSel === null || realSel >= n - 1 ? 0 : realSel + 1;
+    loadReal(i);
+    $('#tb-play').innerHTML = PAUSE;
+    tbTimer = setInterval(() => { i++; if (i >= n){ tbStop(); return; } loadReal(i); }, 220);
+  });
+}
+function syncTimeBar(m){
+  if (!REAL) return;
+  const inp = $('#tb-range'), lab = $('#tb-lab'), tr = $('#tb-track');
+  const idle = realSel === null;
+  if (idle){
+    if (tbTimer) tbStop();
+    lab.innerHTML = '<b>Scenario del pannello</b><span>Sposta il cursore per le ore reali</span>';
+  } else {
+    const r = REAL.righe[realSel], h = r[1];
+    const real = rv(r, 'prezzo_nord');
+    lab.innerHTML = `<b>${tbLabel(realSel)} · ${String(h).padStart(2, '0')}–${String(h + 1).padStart(2, '0')}</b>` +
+      `<span>MGP ${real === null ? '—' : f(real, 1)} · modello ${f(m.cl.price, 1)} €/MWh</span>`;
+    if (+inp.value !== realSel) inp.value = String(realSel);
+  }
+  lab.classList.toggle('idle', idle); tr.classList.toggle('idle', idle);
+  setPct(inp);
+}
+
 function render(){
   const m = computeAll(state);
   lastM = m;
@@ -1604,6 +1689,7 @@ function render(){
   renderCalc(m);
   renderReal(m);
   renderRemit(m);
+  syncTimeBar(m);
 }
 
 if (typeof document === 'undefined'){ globalThis.__model = {computeAll, DEFAULTS, PRESETS, buildStack, clear}; return; }
@@ -1617,7 +1703,7 @@ function init(){
   syncRealPanel();
   document.addEventListener('input', e => {
     const el = e.target;
-    if (!(el instanceof HTMLInputElement) || el.type !== 'range') return;
+    if (!(el instanceof HTMLInputElement) || el.type !== 'range' || !el.id.startsWith('in-')) return;
     const id = el.id.slice(3);
     state[id] = parseFloat(el.value);
     setPct(el);
@@ -1646,6 +1732,7 @@ function init(){
   });
   bindTooltip();
   bindRemit();
+  buildTimeBar();
   let rt = 0;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 120); });
   window.MOQA_render = render;    // usato dal cambio lingua (script in fondo alla pagina)
@@ -1670,7 +1757,8 @@ init();
   });
   const upd = () => {
     let cur = secs[0];
-    for (const s of secs) if (s.getBoundingClientRect().top < 120) cur = s;
+    const lim = document.querySelector('.jumpbar').offsetHeight + 40;   // la barra include il selettore storico
+    for (const s of secs) if (s.getBoundingClientRect().top < lim) cur = s;
     if (cur) set(cur.id);
   };
   window.addEventListener('scroll', upd, {passive:true});

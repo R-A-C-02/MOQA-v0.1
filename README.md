@@ -25,6 +25,10 @@ on the chart in section 9, and the whole page recomputes for that hour. Every sl
 demand, solar, gas available, import capacity, neighbours' price, water value…) moves the stack and
 the price live.
 
+Under the section menu, the **history slider** runs over every hour of the data: drag it (or use the
+arrow keys, or press ▶ to play the hours one after another) and the stack, the charts and the greeks
+follow hour by hour. The faint line behind it is the actual MGP price of the month.
+
 Two buttons at the top right switch the language (Italian / English) and the theme (light / dark);
 the choice is remembered in the browser. Links can set both: `index.html?lang=en&theme=dark`.
 The English texts live in `i18n/en.js` (see *Translations* below). Map of the sections:
