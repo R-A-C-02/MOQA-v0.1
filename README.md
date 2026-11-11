@@ -108,28 +108,6 @@ stays in Italian; the causes written by plant operators in REMIT messages are le
 find texts still missing, open the page with `?lang=en` and run `MOQA_i18n.missing` in the browser
 console.
 
-## Known limitations (v0.1)
-
-- **One month of data.** v0.1 shows the model at work on October 2026; it is not a validated backtest.
-  With the default panel, the model sits on average 27.5 €/MWh below the actual MGP price (MAE
-  27.8 €/MWh): the gap points at the unobserved parameters below.
-- **Parameters not observed in the data** — water value of reservoir hydro, efficiency bands of the
-  gas fleet, scarcity mark-up, temperature sensitivity — are set in the panel and apply to every
-  hour; section 9 shows how far the model sits from the actual MGP price with those settings.
-- **One aggregate neighbour.** Flow-based coupling, loop flows and border-by-border prices are not
-  modelled; the Centre-North exchange is taken as given.
-- **No negative prices.** The stack does not go below zero.
-- **Nominal capacity.** Available capacity is A71 capacity minus REMIT outages. Derating that is not
-  published as a REMIT message (ambient temperature, small reductions) is not subtracted: on
-  1 October at 12:00, on the units both sources list, Terna's available capacity is about 0.9 GW
-  lower than A71 − A80.
-- **Units declared "Other" in A71** (one 840 MW unit named as a CCGT, one battery) stay outside the
-  gas fleet.
-
-## Roadmap
-
-- Longer history (January 2026 onwards) and calibration of the unobserved parameters.
-- Merit-order greeks estimated on history: €/MWh per GW of residual load, by hour.
 
 ## License
 
